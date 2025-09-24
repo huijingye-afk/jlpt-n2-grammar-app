@@ -1,5 +1,4 @@
-
-<!DOCTYPE html>
+YPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +11,7 @@
         - Report Info: 109 JLPT N2 Grammar points with Chinese explanations and Japanese examples.
         - Goal 1: Inform & Engage -> Presentation: Interactive, animated cards (HTML/Tailwind) within a responsive grid. The cards have a subtle hover effect (glow, lift). Interaction: Live search input filters the card display instantly. Justification: This design is visually engaging and makes the large number of grammar points feel manageable and fun to explore.
         - Goal 2: Provide Detailed Reference -> Presentation: A full-screen, semi-transparent modal (HTML/Tailwind/JS) with detailed grammar explanations and examples. Interaction: Triggered by clicking a card and dismissed by an 'x' or an outside click. Justification: The modal provides a focused reading experience for a single grammar point without cluttering the main screen. The dark, transparent overlay fits the tech-dojo theme.
-        - Goal 3: Assess Knowledge (New) -> Presentation: A sentence-rearrangement quiz interface with a word bank and a sentence assembly area. Interaction: User clicks shuffled word blocks to build the correct sentence. Justification: This is a more authentic and effective test of Japanese grammar and sentence structure knowledge compared to simple multiple-choice, providing a more engaging challenge for the user.
+        - Goal 3: Assess Knowledge (New) -> Presentation: A sentence-rearrangement quiz interface with a word bank and a sentence assembly area. Interaction: User clicks shuffled word blocks to build the correct sentence. The correct answer is revealed upon submission for immediate feedback. The user can also undo a step. Upon quiz completion, a dynamic certificate is generated. Justification: This is a more authentic and effective test of Japanese grammar and sentence structure knowledge compared to simple multiple-choice, providing a more engaging challenge for the user. The certificate adds a sense of achievement and provides a personalized summary of learning progress.
         - Library/Method: All components and interactions are built with vanilla JavaScript and styled with a dark-themed, custom Tailwind palette. No charting libraries or SVGs are used. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -51,6 +50,11 @@
         .card-hover:hover {
             box-shadow: 0 0 20px #2dd4bf;
         }
+        .certificate-border {
+            border: 5px solid #2dd4bf;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(45, 212, 191, 0.6);
+        }
     </style>
 </head>
 <body class="bg-[#121212] text-stone-200 antialiased">
@@ -58,7 +62,7 @@
     <div id="app" class="container mx-auto p-4 md:p-8">
 
         <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-6xl font-extrabold text-[#2dd4bf] drop-shadow-lg">JLPT N2 文法道場</h1>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-[#2dd4bf] drop-shadow-lg">珍のJLPT N2 文法道場</h1>
             <p class="text-stone-400 mt-2 text-lg">さあ、文法の修行を始めよう！</p>
         </header>
 
@@ -78,7 +82,7 @@
 
             <section id="quiz-section" class="hidden">
                 <div id="quiz-start-screen" class="text-center bg-[#1e1e1e] p-10 rounded-xl shadow-xl border-2 border-stone-700">
-                    <h2 class="text-3xl font-bold mb-4 text-[#2dd4bf]">文法力測定</h2>
+                    <h2 class="text-3xl font-bold mb-4 text-[#2dd4bf]">文法力每日一测</h2>
                     <p class="mb-8 text-stone-400">修行の成果を試す時が来た。10問のクイズに挑戦し、文法の腕前を測ろう！</p>
                     <button id="start-quiz-btn" class="bg-[#2dd4bf] hover:bg-teal-400 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl shadow-[#2dd4bf]/40">クイズ開始！</button>
                 </div>
@@ -99,6 +103,7 @@
                     <div class="flex flex-wrap justify-center items-center gap-2 md:gap-4 mb-6" id="word-bank"></div>
 
                     <div class="flex justify-center items-center mt-8 space-x-4">
+                        <button id="undo-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">やり直し</button>
                         <button id="check-answer-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">答え合わせ</button>
                         <button id="next-question-btn" class="bg-[#2dd4bf] hover:bg-teal-400 text-stone-800 font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hidden">次の問題へ</button>
                     </div>
@@ -108,12 +113,41 @@
                     <h2 class="text-3xl font-bold mb-4 text-[#2dd4bf]">修行の成果！</h2>
                     <p class="text-6xl font-extrabold my-8 text-white"><span id="quiz-score"></span> / 10</p>
                     <p id="quiz-result-message" class="text-lg mb-8 text-stone-400"></p>
-                    <button id="restart-quiz-btn" class="bg-[#2dd4bf] hover:bg-teal-400 text-stone-800 font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl shadow-[#2dd4bf]/40">再挑戦！</button>
+                    <button id="show-certificate-btn" class="bg-[#2dd4bf] hover:bg-teal-400 text-stone-800 font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl shadow-[#2dd4bf]/40">認定証を受け取る</button>
+                    <button id="restart-quiz-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 mt-4">再挑戦！</button>
                 </div>
             </section>
         </main>
     </div>
 
+    <div id="certificate-modal" class="modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
+        <div id="certificate-content" class="bg-[#1e1e1e] rounded-xl shadow-2xl p-6 md:p-10 max-w-xl w-full text-center relative">
+            <button id="close-certificate-btn" class="absolute top-4 right-4 text-stone-500 hover:text-white text-3xl transition-colors duration-200">&times;</button>
+            <div class="certificate-border p-8">
+                <h2 class="text-3xl font-bold text-[#2dd4bf] mb-2">JLPT N2 文法道場</h2>
+                <h3 class="text-2xl font-bold text-stone-300 mb-6">認定証</h3>
+                
+                <div class="text-left space-y-4 text-stone-400 mb-8">
+                    <p>本日：<span id="cert-date" class="text-white font-semibold"></span></p>
+                    <p>貴方はN2文法クイズに挑戦し、見事に<span id="cert-score" class="text-white font-semibold text-2xl"></span>点という成績を収めました。</p>
+                    <p id="cert-message" class="text-white font-semibold text-lg italic"></p>
+                    <p class="text-stone-500 mt-6">今回の結果を踏まえ、更なる高みを目指し、今後も日本語の修行に励むことを期待します。</p>
+                </div>
+
+                <div id="cert-errors-section" class="text-left hidden mb-8">
+                    <h4 class="text-xl font-bold text-[#ef4444] mb-2">要復習の文法：</h4>
+                    <ul id="cert-errors-list" class="list-disc list-inside space-y-1 text-stone-400"></ul>
+                </div>
+
+                <div class="text-stone-500 mt-8">
+                    <p class="font-bold">文法道場 珍珍</p>
+                </div>
+            </div>
+            <button id="download-cert-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 mt-6">画像として保存</button>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         const grammarData = [
             { id: 1, grammar: '～からといって', meaning: '虽说…但不…', nuance: '100％ではない，正しい理由にならない/不是百分之百，不能成为正当理由，虽说…却不… 不要因为…而…', examples: ['金持ちだからといって、幸せとはかぎらない。/虽说有钱，但未必幸福。', '遊びたいからといって、学校を休むことはできない。/虽说想玩，但不能因此而不去上学。', '日本人だからといって、誰もが敬語を正しく使えるというわけではない。/虽说日本人，但并非人人都能正确使用敬语。'], parts: [['金持ち', 'だからといって', '幸せとは', 'かぎらない'], ['遊びたい', 'からといって', '学校を', '休むことは', 'できない'], ['日本人', 'だからといって', '誰もが', '敬語を', '正しく', '使えるというわけではない']] },
@@ -143,7 +177,7 @@
             { id: 25, grammar: '～ざるを得ない', meaning: '不得不…', nuance: '「～したくないが、しなければならない」/不想做…，但不得不做', examples: ['上司の命令なので、やらざるを得ない。/因为是上司的命令，所以不得不做。', 'みんなが反対しているので、計画をあきらめざるを得ない。/因为大家都反对，所以不得不放弃计划。', '病気のため、旅行を中止せざるを得なかった。/因为生病，不得不中止旅行。'], parts: [['上司の', '命令なので', 'やらざるを', '得ない'], ['みんなが', '反対している', 'ので', '計画を', 'あきらめざるを', '得ない'], ['病気の', 'ため', '旅行を', '中止せざるを', '得なかった']] },
             { id: 26, grammar: '～てはならない', meaning: '不可以…', nuance: '「～てはいけない」という強い禁止。/不可以…（强烈的禁止）', examples: ['人のものを盗んではならない。/不可以偷别人的东西。', '未成年者は酒を飲んではならない。/未成年人不可以喝酒。', 'どんなことがあっても、人をだましてはならない。/无论发生什么，都不可以骗人。'], parts: [['人のものを', '盗んで', 'はならない'], ['未成年者は', '酒を', '飲んでは', 'ならない'], ['どんなことが', 'あっても', '人を', 'だまして', 'はならない']] },
             { id: 27, grammar: '～てばかりはいられない', meaning: '不能光…', nuance: '「ずっと～しているわけにはいかない」/不能一直…', examples: ['もうすぐ試験だから、遊んでばかりはいられない。/马上就要考试了，不能光玩。', '親に頼ってばかりはいられない。/不能一直依赖父母。', '失敗して、いつまでも泣いてばかりはいられない。/失败了，不能一直哭。'], parts: [['もうすぐ', '試験だから', '遊んで', 'ばかりは', 'いられない'], ['親に', '頼って', 'ばかりは', 'いられない'], ['失敗して', 'いつまでも', '泣いて', 'ばかりは', 'いられない']] },
-            { id: 28, grammar: '～ないではいられない', meaning: '忍不住…', nuance: '「どうしても～してしまう」/无论如何都会…', examples: ['彼の話は面白いので、笑わないではいられない。/他说话很有趣，所以忍不住笑。', 'あの感動的な映画を見て、泣かないではいられなかった。/看了那部感人的电影，忍不住哭了。', 'この曲を聞くと、歌わないではいられない。/听到这首歌，忍不住想唱。'], parts: [['彼の', '話は', '面白いので', '笑わない', 'では', 'いられない'], ['あの', '感動的な', '映画を', '見て', '泣かない', 'では', 'いられなかった'], ['この曲を', '聞くと', '歌わない', 'では', 'いられない']] },
+            { id: 28, grammar: '～ないではいられない', meaning: '忍不住…', nuance: '「どうしても～してしまう」/无论如何都会…', examples: ['彼の話は面白いので、笑わないではいられない。/他说话很有趣，所以忍不住笑。', 'あの感動的な映画を見て、泣かないではいられなかった。/看了那部感人的电影，忍不住哭了。', 'この曲を聞くと、歌わないではいられない。/听到那首歌，忍不住想唱。'], parts: [['彼の', '話は', '面白いので', '笑わない', 'では', 'いられない'], ['あの', '感動的な', '映画を', '見て', '泣かない', 'では', 'いられなかった'], ['この曲を', '聞くと', '歌わない', 'では', 'いられない']] },
             { id: 29, grammar: '～わけにはいかない', meaning: '不能…', nuance: '「事情があって、～できない」/因为有原因，所以不能…', examples: ['明日は大事な会議があるから、休むわけにはいかない。/明天有重要的会议，所以不能休息。', '友達との約束だから、行かないわけにはいかない。/因为和朋友有约定，所以不能不去。', '税金は、払わないわけにはいかない。/税金不能不交。'], parts: [['明日は', '大事な', '会議が', 'あるから', '休む', 'わけには', 'いかない'], ['友達との', '約束だから', '行かない', 'わけには', 'いかない'], ['税金は', '払わない', 'わけには', 'いかない']] },
             { id: 30, grammar: '～わけではない', meaning: '并非…', nuance: '「100％～だ、とは言えない」という部分否定/并非100%是…，部分否定', examples: ['高い料理がすべておいしいわけではない。/贵的料理并非全部都好吃。', 'お金があれば幸せになれるというわけではない。/并非有钱就能幸福。', '日本人がみんな、納豆が好きというわけではない。/并非所有日本人都喜欢纳豆。'], parts: [['高い', '料理が', 'すべて', 'おいしい', 'わけではない'], ['お金が', 'あれば', '幸せに', 'なれると', 'いう', 'わけではない'], ['日本人が', 'みんな', '納豆が', '好き', 'という', 'わけでは', 'ない']] },
             { id: 31, grammar: '～ことはない', meaning: '不必…', nuance: '「～する必要はない」/没有…的必要', examples: ['そんなに急ぐことはない。/没必要那么急。', 'わざわざお土産を持ってくることはないよ。/没必要特意带礼物来。', 'がっかりすることはない。次のチャンスがあるから。/没必要那么失望，还有下一次机会。'], parts: [['そんなに', '急ぐ', 'ことはない'], ['わざわざ', 'お土産を', '持って', 'くる', 'ことはないよ'], ['がっかりする', 'ことはない', '次の', 'チャンスが', 'あるから']] },
@@ -165,9 +199,9 @@
             { id: 47, grammar: '～に対して', meaning: '对…', nuance: '「～を相手に」/以…为对象', examples: ['お客様に対して、失礼な態度をとってはいけない。/对客人，不能采取失礼的态度。', '彼は年上に対して、いつも丁寧な言葉を使う。/他对长辈，总是使用礼貌的语言。', '子供たちに対して、親は責任がある。/对孩子们，父母有责任。'], parts: [['お客様に', '対して', '失礼な', '態度を', 'とっては', 'いけない'], ['彼は', '年上に', '対して', 'いつも', '丁寧な', '言葉を', '使う'], ['子供たちに', '対して', '親は', '責任が', 'ある']] },
             { id: 48, grammar: '～にとって', meaning: '对…而言', nuance: '「～という立場から考えると」/从…的立场来考虑', examples: ['私にとって、家族が一番大切だ。/对我来说，家人最重要。', 'この本は、初心者にとってとても役立つ。/这本书对初学者很有帮助。', '彼にとって、この試合は人生をかけたものだ。/对他来说，这场比赛是赌上了人生的。'], parts: [['私に', 'とって', '家族が', '一番', '大切だ'], ['この本は', '初心者', 'にとって', 'とても', '役立つ'], ['彼に', 'とって', 'この試合は', '人生を', 'かけた', 'ものだ']] },
             { id: 49, grammar: '～に関して', meaning: '关于…', nuance: '「～という事柄について」/关于…', examples: ['この事件に関して、何か知っていることはありますか。/关于这个事件，你知道些什么吗？', '日本の文化に関して、もっと詳しく知りたい。/关于日本文化，想了解得更详细一些。', 'この計画に関する資料は、ここにあります。/关于这个计划的资料，在这里。'], parts: [['この事件に', '関して', '何か', '知っている', 'ことは', 'ありますか'], ['日本の', '文化に', '関して', 'もっと', '詳しく', '知りたい'], ['この計画に', '関する', '資料は', 'ここに', 'あります']] },
-            { id: 50, grammar: '～によって', meaning: '根据…', nuance: '「～の方法、手段、原因」/根据…的方法、手段、原因', examples: ['インターネットによって、世界中の情報が手に入る。/通过互联网，能得到全世界的信息。', 'この建物は地震によって倒壊した。/这座建筑因为地震而倒塌了。', 'この料理の味は、作る人によって違う。/这道菜的味道，根据做的人不同而不同。'], parts: [['インターネットに', 'よって', '世界中の', '情報が', '手に入る'], ['この建物は', '地震に', 'よって', '倒壊した'], ['この料理の', '味は', '作る人に', 'よって', '違う']] },
+            { id: 50, grammar: '～によって', meaning: '根据…', nuance: '「～の方法、手段、原因」/根据…的方法、手段、原因', examples: ['インターネットによって、世界中の情報が手に入る。/通过互联网，能得到全世界的信息。', 'この建物は地震によって倒壊した。/这座建筑因为地震而倒塌了。', 'この料理の味は、作る人によって違う。/这道菜的味道，根据做的人不同而不同。'], parts: [['インターネット', 'によって', '世界中の', '情報が', '手に入る'], ['この建物は', '地震に', 'よって', '倒壊した'], ['この料理の', '味は', '作る人に', 'よって', '違う']] },
             { id: 51, grammar: '～に反して', meaning: '违反…', nuance: '「～に逆らって、～と違って」/违反…，和…不同', examples: ['先生の忠告に反して、遊びに行ってしまった。/违反了老师的忠告，去玩了。', '予想に反して、テストは簡単だった。/和预想相反，考试很简单。', '父の期待に反して、私は医者にならなかった。/违背了父亲的期望，我没有成为医生。'], parts: [['先生の', '忠告に', '反して', '遊びに', '行ってしまった'], ['予想に', '反して', 'テストは', '簡単だった'], ['父の', '期待に', '反して', '私は', '医者に', 'ならなかった']] },
-            { id: 52, grammar: '～にわたって', meaning: '持续…', nuance: '「～という範囲全体、期間全体」/持续…（整个范围、整个期间）', examples: ['その会議は、３日間にわたって行われた。/那个会议持续了3天。', 'この災害は、広い範囲にわたって被害を及ぼした。/这个灾害给大范围带来了损害。', '彼は２０年にわたって、この研究を続けている。/他持续了20年这个研究。'], parts: [['その会議は', '３日間に', 'わたって', '行われた'], ['この災害は', '広い範囲に', 'わたって', '被害を', '及ぼした'], ['彼は', '２０年に', 'わたって', 'この研究を', '続けている']] },
+            { id: 52, grammar: '～にわたって', meaning: '持续…', nuance: '「～という範囲全体、期間全体」/持续…（整个范围、整个期间）', examples: ['その会議は、３日間にわたって行われた。/那个会议持续了3天。', 'この災害は、広い範囲にわたって被害を及ぼした。/这个灾害给大范围带来了损害。', '彼は２０年にわたって、この研究を続けている。/他持续了20年这个研究。'], parts: [['その会議は', '３日間に', 'わたって', '行われた'], ['この災害は', '広い', '範囲に', 'わたって', '被害を', '及ぼした'], ['彼は', '２０年に', 'わたって', 'この研究を', '続けている']] },
             { id: 53, grammar: '～にわたる', meaning: '遍及…', nuance: '「～という範囲全体に及ぶ」/遍及…（整个范围）', examples: ['彼は２０年にわたる研究をまとめた。/他总结了持续20年的研究。', '３時間にわたる熱戦の末、ついに勝利を勝ち取った。/3个小时的激战后，终于取得了胜利。', 'この地震は、広い地域にわたる被害をもたらした。/这次地震，给大范围带来了损害。'], parts: [['彼は', '２０年に', 'わたる', '研究を', 'まとめた'], ['３時間に', 'わたる', '熱戦の', '末', 'ついに', '勝利を', '勝ち取った'], ['この地震は', '広い', '地域に', 'わたる', '被害を', 'もたらした']] },
             { id: 54, grammar: '～に応じて', meaning: '根据…', nuance: '「～の状況に合わせて、～に対応して」/根据…的情况，做出相应的对应', examples: ['天候に応じて、計画を変更する。/根据天气，更改计划。', 'お客様のニーズに応じて、サービスを提供する。/根据客人的需求，提供服务。', '能力に応じて、仕事を与える。/根据能力，分配工作。'], parts: [['天候に', '応じて', '計画を', '変更する'], ['お客様の', 'ニーズに', '応じて', 'サービスを', '提供する'], ['能力に', '応じて', '仕事を', '与える']] },
             { id: 55, grammar: '～につれて', meaning: '随着…', nuance: '「～の変化とともに、～も変化する」/随着…的变化，…也变化', examples: ['日本に来る人が増えるにつれて、日本語を学ぶ人も増えている。/随着来日本的人增多，学日语的人也增多了。', '寒くなるにつれて、紅葉が美しくなった。/随着天气变冷，红叶变美了。', '成長するにつれて、考え方も変わる。/随着成长，想法也变了。'], parts: [['日本に', '来る', '人が', '増える', 'につれて', '日本語を', '学ぶ人も', '増えている'], ['寒くなる', 'につれて', '紅葉が', '美しくなった'], ['成長する', 'につれて', '考え方も', '変わる']] },
@@ -176,15 +210,15 @@
             { id: 58, grammar: '～によって', meaning: '通过…', nuance: '「～という手段、方法」/通过…的手段、方法', examples: ['インターネットによって、世界中の情報が手に入る。/通过互联网，能得到全世界的信息。', '努力することによって、夢は叶う。/通过努力，梦想会实现。', 'この機械は電気によって動く。/这台机器通过电力来运转。'], parts: [['インターネット', 'によって', '世界中の', '情報が', '手に入る'], ['努力する', 'ことに', 'よって', '夢は', '叶う'], ['この機械は', '電気に', 'よって', '動く']] },
             { id: 59, grammar: '～ことになっている', meaning: '被规定…', nuance: '「～という規則、習慣、予定がある」/有…的规定、习惯、预定', examples: ['この図書館では、静かにすることになっている。/这个图书馆规定要保持安静。', '法律では、車は左側通行することになっている。/法律规定，车要靠左行驶。', '明日から出張に行くことになっています。/我明天要去出差。'], parts: [['この図書館では', '静かに', 'する', 'ことになって', 'いる'], ['法律では', '車は', '左側通行', 'する', 'ことになって', 'いる'], ['明日から', '出張に', '行く', 'ことに', 'なっています']] },
             { id: 60, grammar: '～ことだ', meaning: '…是应该做的', nuance: '「～したほうがいい」という忠告、アドバイス/劝告或建议…', examples: ['健康のためには、毎日運動することだ。/为了健康，每天都要运动。', '困ったときは、すぐに先生に相談することだ。/有困难时，马上和老师商量。', '日本語を上達させたいなら、毎日聞くことだ。/如果想提高日语，每天都要听。'], parts: [['健康の', 'ためには', '毎日', '運動する', 'ことだ'], ['困った', 'ときは', 'すぐに', '先生に', '相談する', 'ことだ'], ['日本語を', '上達させたい', 'なら', '毎日', '聞く', 'ことだ']] },
-            { id: 61, grammar: '～はずがない', meaning: '不可能…', nuance: '「～であるはずがない」/不可能…', examples: ['あの真面目な彼が、そんな嘘をつくはずがない。/那个认真的他，不可能说那种谎话。', 'こんなに一生懸命練習したんだから、失敗するはずがない。/这么努力练习了，不可能失败。', '彼が知らないはずがない。/他不可能不知道。'], parts: [['あの', '真面目な', '彼が', 'そんなことを', 'する', 'はずがない'], ['こんなに', '一生懸命', '練習したんだから', '失敗する', 'はずがない'], ['彼が', '知らない', 'はずがない']] },
+            { id: 61, grammar: '～はずがない', meaning: '不可能…', nuance: '「～であるはずがない」/不可能…', examples: ['あの真面目な彼が、そんな嘘をつくはずがない。/那个认真的他，不可能说那种谎话。', 'こんなに一生懸命練習したんだから、失敗するはずがない。/这么努力练习了，不可能失败。', '彼が知らないはずがない。/他不可能不知道。'], parts: [['あの真面目な', '彼が', 'そんな嘘を', 'つく', 'はずがない'], ['こんなに', '一生懸命', '練習したんだから', '失敗する', 'はずがない'], ['彼が', '知らない', 'はずがない']] },
             { id: 62, grammar: '～にほかならない', meaning: '无非是…', nuance: '「～以外のものではない」/除了…之外没有别的东西', examples: ['この成功は、彼の努力にほかならない。/这次成功，无非是他努力的结果。', '彼の言葉は、言い訳にほかならない。/他说的话，只不过是借口。', 'この決定は、国の未来を左右するにほかならない。/这个决定，无非是左右国家未来。'], parts: [['この成功は', '彼の', '努力に', 'ほかならない'], ['彼の', '言葉は', '言い訳に', 'ほかならない'], ['この決定は', '国の', '未来を', '左右する', 'に', 'ほかならない']] },
             { id: 63, grammar: '～にすぎない', meaning: '只不过是…', nuance: '「～以上ではない、たいしたことない」/只不过是…，没什么大不了', examples: ['彼はただの学生にすぎない。/他只不过是个学生。', '彼の給料は、月に20万円にすぎない。/他的工资，只不过是20万日元一个月。', 'このプロジェクトはまだ初期段階にすぎない。/这个项目还只不过是初期阶段。'], parts: [['彼は', 'ただの', '学生に', 'すぎない'], ['彼の', '給料は', '月に', '20万円に', 'すぎない'], ['このプロジェクトは', 'まだ', '初期段階に', 'すぎない']] },
             { id: 64, grammar: '～に決まっている', meaning: '肯定…', nuance: '話し手の強い確信/说话人强烈的确信', examples: ['あんなに準備したんだから、成功するに決まっている。/准备了那么久，肯定会成功。', '彼女は日本語が上手だから、N1に合格するに決まっている。/她日语那么好，肯定能通过N1。', 'そんな話は、嘘に決まっている。/那种话，肯定是谎话。'], parts: [['あんなに', '準備したんだから', '成功する', 'に', '決まっている'], ['彼女は', '日本語が', '上手だから', 'N1に', '合格する', 'に', '決まっている'], ['そんな', '話は', '嘘に', '決まっている']] },
             { id: 65, grammar: '～に違いない', meaning: '肯定…', nuance: '「絶対に～だ」という強い推量/“绝对是…”的强烈推测', examples: ['窓が割れている。泥棒が入ったに違いない。/窗户坏了。肯定有小偷进来了。', '彼は日本語が上手なので、日本に住んだことがあるに違いない。/他日语那么好，肯定在日本住过。', 'この事件の犯人は彼に違いない。/这起事件的犯人肯定是他。'], parts: [['窓が', '割れている', '泥棒が', '入った', 'に違いない'], ['彼は', '日本語が', '上手なので', '日本に', '住んだことが', 'ある', 'に違いない'], ['この事件の', '犯人は', '彼に', '違いない']] },
-            { id: 66, grammar: '～とは限らない', meaning: '不一定…', nuance: '「～とは言い切れない」/不一定…', examples: ['人間だれしも失敗しないとは限らない。/人并非不失败。', 'お金持ちが幸せだとは限らない。/有钱人未必幸福。', '強いチームが勝つとは限らない。/强的队伍不一定赢。'], parts: [['人間', 'だれしも', '失敗しない', 'とは', '限らない'], ['お金持ちが', '幸せだ', 'とは', '限らない'], ['強い', 'チームが', '勝つ', 'とは', '限らない']] },
+            { id: 66, grammar: '～とは限らない', meaning: '不一定…', nuance: '「～とは言い切れない」/不一定…', examples: ['お金持ちが幸せだとは限らない。/有钱人未必幸福。', '日本語を勉強すれば、誰でも話せるようになるとは限らない。/学了日语，不一定谁都能说好。', '強いチームが勝つとは限らない。/强的队伍不一定赢。'], parts: [['人間', 'だれしも', '失敗しない', 'とは', '限らない'], ['お金持ちが', '幸せだ', 'とは', '限らない'], ['強い', 'チームが', '勝つ', 'とは', '限らない']] },
             { id: 67, grammar: '～てはならない', meaning: '不可以…', nuance: '「～てはいけない」という強い禁止/不可以…（强烈的禁止）', examples: ['他人のものを盗んではならない。/不可以偷别人的东西。', '未成年者は酒を飲んではならない。/未成年人不可以喝酒。', '危険な場所に入ってはいけない。/不可以进入危险的地方。'], parts: [['他人のものを', '盗んで', 'はならない'], ['未成年者は', '酒を', '飲んでは', 'ならない'], ['危険な', '場所に', '入って', 'はいけない']] },
             { id: 68, grammar: '～てばかりはいられない', meaning: '不能光…', nuance: '「ずっと～しているわけにはいかない」/不能一直…', examples: ['もうすぐ試験だから、遊んでばかりはいられない。/马上就要考试了，不能光玩。', 'いつまでも親に頼ってばかりはいられない。/不能一直依赖父母。', '失敗したからといって、悲しんでばかりはいられない。/即使失败了，也不能一直哭。'], parts: [['もうすぐ', '試験だから', '遊んで', 'ばかりは', 'いられない'], ['いつまでも', '親に', '頼って', 'ばかりは', 'いられない'], ['失敗したから', 'といって', '悲しんで', 'ばかりは', 'いられない']] },
-            { id: 69, grammar: '～ないではいられない', meaning: '忍不住…', nuance: '「どうしても～してしまう」/无论如何都忍不住…', examples: ['あの面白い話を聞いて、笑わないではいられなかった。/听了那个有趣的故事，忍不住笑了。', 'その曲を聴くと、踊らないではいられない。/听到那首歌，忍不住想跳舞。', '彼の親切に、感謝しないではいられない。/对他的好心，忍不住感谢。'], parts: [['あの', '面白い', '話を', '聞いて', '笑わない', 'では', 'いられない'], ['その曲を', '聞くと', '踊らない', 'では', 'いられない'], ['彼の', '親切に', '感謝', 'しない', 'では', 'いられない']] },
+            { id: 69, grammar: '～ないではいられない', meaning: '忍不住…', nuance: '「どうしても～してしまう」/无论如何都忍不住…', examples: ['あの面白い話を聞いて、笑わないではいられない。/听了那个有趣的故事，忍不住笑了。', 'その曲を聴くと、踊らないではいられない。/听到那首歌，忍不住想跳舞。', '彼の親切に、感謝しないではいられない。/对他的好心，忍不住感谢。'], parts: [['あの', '面白い', '話を', '聞いて', '笑わない', 'では', 'いられない'], ['その曲を', '聞くと', '踊らない', 'では', 'いられない'], ['彼の', '親切に', '感謝', 'しない', 'では', 'いられない']] },
             { id: 70, grammar: '～ざるを得ない', meaning: '不得不…', nuance: '「～したくないが、しなければならない」/不想做…，但不得不做', examples: ['社長の命令なので、従わざるを得ない。/因为是社长的命令，所以不得不服从。', '雨が降ってきたので、試合を中止せざるを得なかった。/因为下雨了，所以不得不中止比赛。', '彼に謝らざるを得ない。/不得不向他道歉。'], parts: [['社長の', '命令なので', '従わざるを', '得ない'], ['雨が', '降ってきたので', '試合を', '中止せざるを', '得なかった'], ['彼に', '謝らざるを', '得ない']] },
             { id: 71, grammar: '～ことだ', meaning: '…是应该做的', nuance: '「～したほうがいい」という忠告、アドバイス/劝告或建议…', examples: ['健康のためには、毎日運動することだ。/为了健康，每天都要运动。', '困ったときは、すぐに先生に相談することだ。/有困难时，马上和老师商量。', '日本語を上達させたいなら、毎日聞くことだ。/如果想提高日语，每天都要听。'], parts: [['健康の', 'ためには', '毎日', '運動する', 'ことだ'], ['困った', 'ときは', 'すぐに', '先生に', '相談する', 'ことだ'], ['日本語を', '上達させたい', 'なら', '毎日', '聞く', 'ことだ']] },
             { id: 72, grammar: '～はずだ', meaning: '应该…', nuance: '「～という推量、確信」/应该…，确信', examples: ['彼はもう家に着いているはずだ。/他应该已经到家了。', '彼女は日本語が上手だから、N1に合格するはずだ。/她日语那么好，应该能通过N1。', '電車は時間通りに来るはずだ。/电车应该会准时到。'], parts: [['彼は', 'もう', '家に', '着いている', 'はずだ'], ['彼女は', '日本語が', '上手だから', 'N1に', '合格する', 'はずだ'], ['電車は', '時間通りに', '来る', 'はずだ']] },
@@ -193,9 +227,9 @@
             { id: 75, grammar: '～ないわけにはいかない', meaning: '不能不…', nuance: '「どうしても～しなければならない」/无论如何都不得不…', examples: ['部長に頼まれたから、行かないわけにはいかない。/因为是部长拜托的，所以不能不去。', '親友の結婚式だから、出席しないわけにはいかない。/因为是好朋友的婚礼，所以不能不出席。', '会社の飲み会はあまり好きじゃないけど、行かないわけにはいかない。/虽然不太喜欢公司的酒会，但不能不去。'], parts: [['部長に', '頼まれたから', '行かない', 'わけには', 'いかない'], ['親友の', '結婚式だから', '出席しない', 'わけには', 'いかない'], ['会社の', '飲み会は', 'あまり', '好きじゃないけど', '行かない', 'わけには', 'いかない']] },
             { id: 76, grammar: '～どころではない', meaning: '岂止是…，哪有工夫…', nuance: '「～どころではない」/哪里是…，根本没时间…', examples: ['忙しくて、映画を見るどころではない。/忙得连看电影的时间都没有。', 'この地震で、遊んでいるどころではない。/发生地震了，哪有时间玩。', '病気で、食事どころではない。/生病了，根本吃不下饭。'], parts: [['忙しくて', '映画を', '見る', 'どころではない'], ['この地震で', '遊んでいる', 'どころではない'], ['病気で', '食事', 'どころではない']] },
             { id: 77, grammar: '～ほど～ない', meaning: '不如…', nuance: '「～ほど～ではない」/不如…', examples: ['私は彼女ほど日本語が上手ではない。/我的日语没有她那么好。', 'この問題は、思ったほど難しくない。/这个问题，没有想象中那么难。', '今年の夏は、去年ほど暑くない。/今年的夏天，没有去年那么热。'], parts: [['私は', '彼女ほど', '日本語が', '上手', 'ではない'], ['この問題は', '思ったほど', '難しく', 'ない'], ['今年の夏は', '去年ほど', '暑く', 'ない']] },
-            { id: 78, grammar: '～ないではいられない', meaning: '忍不住…', nuance: '「どうしても～してしまう」/无论如何都忍不住…', examples: ['あの感動的な映画を見て、泣かないではいられなかった。/看了那部感人的电影，忍不住哭了。', 'その曲を聴くと、踊らないではいられない。/听到那首歌，忍不住想跳舞。', '彼の親切に、感謝しないではいられない。/对他的好心，忍不住感谢。'], parts: [['あの', '感動的な', '映画を', '見て', '泣かない', 'では', 'いられなかった'], ['その曲を', '聞くと', '踊らない', 'では', 'いられない'], ['彼の', '親切に', '感謝', 'しない', 'では', 'いられない']] },
+            { id: 78, grammar: '～ないではいられない', meaning: '忍不住…', nuance: '「どうしても～してしまう」/无论如何都忍不住…', examples: ['あの感動的な映画を見て、泣かないではいられない。/看了那部感人的电影，忍不住哭了。', 'その曲を聴くと、踊らないではいられない。/听到那首歌，忍不住想跳舞。', '彼の親切に、感謝しないではいられない。/对他的好心，忍不住感谢。'], parts: [['あの', '感動的な', '映画を', '見て', '泣かない', 'では', 'いられなかった'], ['その曲を', '聞くと', '踊らない', 'では', 'いられない'], ['彼の', '親切に', '感謝', 'しない', 'では', 'いられない']] },
             { id: 79, grammar: '～ずに', meaning: '不…', nuance: '「～しないで」/不…', examples: ['彼は何も言わずに部屋を出て行った。/他一言不发地走出了房间。', '朝ごはんを食べずに、学校に行った。/没吃早饭就去上学了。', '誰にも相談せずに、一人で決めた。/没和任何人商量，自己一个人决定了。'], parts: [['彼は', '何も', '言わずに', '部屋を', '出て', '行った'], ['朝ごはんを', '食べずに', '学校に', '行った'], ['誰にも', '相談せずに', '一人で', '決めた']] },
-            { id: 80, grammar: '～に比べて', meaning: '和…相比', nuance: '「～と比較して」/和…比较', examples: ['去年に比べて、今年は雨が多い。/和去年相比，今年雨水多。', '都会に比べて、田舎は空気がきれいだ。/和城市相比，乡村的空气更干净。', '姉に比べて、妹は背が高い。/和姐姐相比，妹妹更高。'], parts: [['去年に', '比べて', '今年は', '雨が', '多い'], ['都会に', '比べて', '田舎は', '空気が', 'きれいだ'], ['姉に', '比べて', '妹は', '背が', '高い']] },
+            { id: 80, grammar: '～に比べて', meaning: '和…相比', nuance: '「～と比較して」/和…比较', examples: ['去年に比べて、今年は雨が多い。/和去年相比，今年雨水多。', '都会に比べて、田舎は空気がきれいだ。/和城市相比，乡村的空气更干净。', '姉に比べて、妹は背が高い。/和姐姐相比，我个子矮。'], parts: [['去年に', '比べて', '今年は', '雨が', '多い'], ['都会に', '比べて', '田舎は', '空気が', 'きれいだ'], ['姉に', '比べて', '妹は', '背が', '高い']] },
             { id: 81, grammar: '～とともに', meaning: '与…一起', nuance: '「～と一緒に」/和…一起', examples: ['家族とともに、幸せな時間を過ごした。/和家人一起，度过了幸福的时光。', '時代とともに、価値観は変わる。/随着时代，价值观也在改变。', '成長するとともに、責任も重くなる。/随着成长，责任也变重了。'], parts: [['家族と', 'ともに', '幸せな', '時間を', '過ごした'], ['時代と', 'ともに', '価値観は', '変わる'], ['成長すると', 'ともに', '責任も', '重くなる']] },
             { id: 82, grammar: '～に応じて', meaning: '根据…', nuance: '「～の状況に合わせて、～に対応して」/根据…的情况，做出相应的对应', examples: ['天候に応じて、計画を変更する。/根据天气，更改计划。', 'お客様のニーズに応じて、サービスを提供する。/根据客人的需求，提供服务。', '能力に応じて、仕事を与える。/根据能力，分配工作。'], parts: [['天候に', '応じて', '計画を', '変更する'], ['お客様の', 'ニーズに', '応じて', 'サービスを', '提供する'], ['能力に', '応じて', '仕事を', '与える']] },
             { id: 83, grammar: '～にかけては', meaning: '在…方面', nuance: '「～に関しては、誰にも負けない」/在…方面，不输给任何人', examples: ['彼は料理にかけては、誰にも負けない。/在做饭方面，他不输给任何人。', '彼女は歌にかけては、プロ並みだ。/在唱歌方面，她像专业人士一样。', '数学にかけては、彼が一番だ。/在数学方面，他最厉害。'], parts: [['彼は', '料理に', 'かけては', '誰にも', '負けない'], ['彼女は', '歌に', 'かけては', 'プロ並みだ'], ['数学に', 'かけては', '彼が', '一番だ']] },
@@ -240,13 +274,20 @@
             const quizResultsScreen = document.getElementById('quiz-results-screen');
             const startQuizBtn = document.getElementById('start-quiz-btn');
             const restartQuizBtn = document.getElementById('restart-quiz-btn');
+            const undoBtn = document.getElementById('undo-btn');
             const checkAnswerBtn = document.getElementById('check-answer-btn');
             const nextQuestionBtn = document.getElementById('next-question-btn');
             const wordBankEl = document.getElementById('word-bank');
             const sentenceAssemblyEl = document.getElementById('sentence-assembly');
             const quizFeedbackEl = document.getElementById('quiz-feedback');
+            const showCertificateBtn = document.getElementById('show-certificate-btn');
+            const certificateModal = document.getElementById('certificate-modal');
+            const closeCertificateBtn = document.getElementById('close-certificate-btn');
+            const downloadCertBtn = document.getElementById('download-cert-btn');
         
             let currentQuizState = {};
+            let selectedBlocks = [];
+            let incorrectAnswers = [];
         
             function showSection(sectionId) {
                 const navBtns = document.querySelectorAll('.nav-btn');
@@ -343,13 +384,14 @@
             }
         
             function startQuiz() {
-                const shuffled = [...grammarData].sort(() => 0.5 - Math.random());
+                const shuffled = [...grammarData].filter(item => item.parts && item.parts.length > 0 && item.examples && item.examples.length > 0).sort(() => 0.5 - Math.random());
                 currentQuizState = {
                     questions: shuffled.slice(0, 10),
                     currentQuestionIndex: 0,
                     score: 0,
                     userAnswer: [],
                     correctAnswer: [],
+                    incorrect: []
                 };
                 quizStartScreen.classList.add('hidden');
                 quizResultsScreen.classList.add('hidden');
@@ -369,8 +411,10 @@
                 
                 state.userAnswer = [];
                 state.correctAnswer = parts;
+                state.currentExample = questionData.examples[questionData.parts.indexOf(parts)];
                 
                 const shuffledParts = [...parts].sort(() => 0.5 - Math.random());
+                selectedBlocks = [];
                 
                 document.getElementById('question-number').textContent = state.currentQuestionIndex + 1;
                 sentenceAssemblyEl.innerHTML = `<span class="text-stone-500">ここに語順を並べてみましょう</span>`;
@@ -379,19 +423,23 @@
                     const block = document.createElement('button');
                     block.className = 'word-block bg-[#2dd4bf] text-stone-800 font-semibold py-2 px-4 rounded-lg transition-transform duration-200';
                     block.textContent = part;
-                    block.addEventListener('click', () => assembleSentence(block, part, index));
+                    block.dataset.originalIndex = index;
+                    block.addEventListener('click', () => assembleSentence(block, part));
                     wordBankEl.appendChild(block);
                 });
         
                 quizFeedbackEl.textContent = '';
                 checkAnswerBtn.classList.remove('hidden');
+                checkAnswerBtn.classList.remove('bg-[#2dd4bf]', 'hover:bg-teal-400');
+                checkAnswerBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
                 nextQuestionBtn.classList.add('hidden');
+                undoBtn.classList.remove('hidden');
                 
                 const progress = ((state.currentQuestionIndex) / state.questions.length) * 100;
                 document.getElementById('progress-bar').style.width = `${progress}%`;
             }
             
-            function assembleSentence(block, part, index) {
+            function assembleSentence(block, part) {
                 const state = currentQuizState;
                 if (state.userAnswer.length === 0) {
                     sentenceAssemblyEl.innerHTML = '';
@@ -401,9 +449,11 @@
                 const assembledBlock = document.createElement('span');
                 assembledBlock.className = 'py-2 px-3 m-1 bg-[#242424] text-stone-300 rounded-md';
                 assembledBlock.textContent = part;
+                assembledBlock.dataset.originalIndex = block.dataset.originalIndex;
                 sentenceAssemblyEl.appendChild(assembledBlock);
                 
                 state.userAnswer.push(part);
+                selectedBlocks.push(block);
                 block.classList.add('selected');
                 
                 if (state.userAnswer.length === state.correctAnswer.length) {
@@ -414,32 +464,62 @@
                     checkAnswerBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
                 }
             }
+
+            function undoLastAction() {
+                const state = currentQuizState;
+                if (state.userAnswer.length > 0) {
+                    const lastWord = state.userAnswer.pop();
+                    const lastBlock = selectedBlocks.pop();
+                    
+                    sentenceAssemblyEl.removeChild(sentenceAssemblyEl.lastChild);
+                    lastBlock.classList.remove('selected');
+                    
+                    if (state.userAnswer.length === 0) {
+                        sentenceAssemblyEl.innerHTML = `<span class="text-stone-500">ここに語順を並べてみましょう</span>`;
+                        checkAnswerBtn.classList.remove('bg-[#2dd4bf]', 'hover:bg-teal-400');
+                        checkAnswerBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                    }
+                    
+                    if (state.userAnswer.length !== state.correctAnswer.length) {
+                        checkAnswerBtn.classList.remove('bg-[#2dd4bf]', 'hover:bg-teal-400');
+                        checkAnswerBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                    }
+                }
+            }
             
             function checkAnswer() {
                 const state = currentQuizState;
-                if (state.userAnswer.length !== state.correctAnswer.length) {
-                    quizFeedbackEl.textContent = '語順を完成させてください！';
-                    quizFeedbackEl.className = 'text-lg font-bold text-red-500';
-                    return;
-                }
-        
+                const feedbackEl = document.getElementById('quiz-feedback');
+                
                 const isCorrect = JSON.stringify(state.userAnswer) === JSON.stringify(state.correctAnswer);
                 
                 if (isCorrect) {
                     state.score++;
-                    quizFeedbackEl.textContent = '正解！';
-                    quizFeedbackEl.className = 'text-lg font-bold text-green-500';
+                    feedbackEl.textContent = '正解！';
+                    feedbackEl.className = 'text-lg font-bold text-green-500';
                     sentenceAssemblyEl.classList.add('correct-order');
                 } else {
-                    quizFeedbackEl.textContent = '不正解';
-                    quizFeedbackEl.className = 'text-lg font-bold text-red-500';
+                    feedbackEl.textContent = '不正解';
+                    feedbackEl.className = 'text-lg font-bold text-red-500';
+                    state.incorrect.push({
+                        grammar: state.questions[state.currentQuestionIndex].grammar,
+                        example: state.currentExample
+                    });
                 }
+                
+                const [ja, zh] = state.currentExample.split('/');
+                sentenceAssemblyEl.innerHTML = `
+                    <p class="text-white text-lg font-semibold">${ja}</p>
+                    <p class="text-stone-400 text-sm mt-1">${zh}</p>
+                    <p class="text-[#2dd4bf] text-sm mt-2 font-bold">${state.questions[state.currentQuestionIndex].grammar}</p>
+                `;
                 
                 const allBlocks = document.querySelectorAll('.word-block');
                 allBlocks.forEach(block => block.classList.add('selected'));
         
                 checkAnswerBtn.classList.add('hidden');
                 nextQuestionBtn.classList.remove('hidden');
+                undoBtn.classList.add('hidden');
             }
             
             function nextQuestion() {
@@ -465,14 +545,78 @@
                     messageEl.textContent = 'まだまだ伸びしろがありますね。文法ライブラリで復習しましょう！';
                 }
             }
+
+            function showCertificate() {
+                const state = currentQuizState;
+                certificateModal.classList.remove('hidden');
+                
+                const today = new Date();
+                const dateString = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+                document.getElementById('cert-date').textContent = dateString;
+                document.getElementById('cert-score').textContent = state.score;
+
+                const messageEl = document.getElementById('cert-message');
+                if (state.score === 10) {
+                    messageEl.textContent = '全問正解！素晴らしい集中力と知識です。';
+                } else if (state.score >= 7) {
+                    messageEl.textContent = '優秀な成績です！この調子で、更なる高みを目指しましょう。';
+                } else if (state.score >= 4) {
+                    messageEl.textContent = 'よく頑張りました。次のステップは、間違えた文法の復習です。';
+                } else {
+                    messageEl.textContent = 'あなたの努力は無駄になりません。復習を重ね、強くなろう！';
+                }
+
+                const errorsListEl = document.getElementById('cert-errors-list');
+                errorsListEl.innerHTML = '';
+                if (state.incorrect.length > 0) {
+                    document.getElementById('cert-errors-section').classList.remove('hidden');
+                    state.incorrect.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'text-stone-400';
+                        li.innerHTML = `<strong>${item.grammar}</strong>: <span class="text-sm italic">${item.example.split('/')[0]}</span>`;
+                        errorsListEl.appendChild(li);
+                    });
+                } else {
+                    document.getElementById('cert-errors-section').classList.add('hidden');
+                }
+            }
+
+            function downloadCertificate() {
+                const content = document.getElementById('certificate-content');
+                const originalBgColor = content.style.backgroundColor;
+                const originalBoxShadow = content.style.boxShadow;
+                content.style.backgroundColor = '#1e1e1e';
+                content.style.boxShadow = 'none';
+
+                html2canvas(content, {
+                    backgroundColor: '#1e1e1e',
+                    scale: 2
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'JLPT_N2_Certificate.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    content.style.backgroundColor = originalBgColor;
+                    content.style.boxShadow = originalBoxShadow;
+                });
+            }
             
             navLibrary.addEventListener('click', () => showSection('library'));
             navQuiz.addEventListener('click', () => showSection('quiz'));
             searchInput.addEventListener('input', (e) => renderGrammarCards(e.target.value));
             startQuizBtn.addEventListener('click', startQuiz);
             restartQuizBtn.addEventListener('click', startQuiz);
+            undoBtn.addEventListener('click', undoLastAction);
             checkAnswerBtn.addEventListener('click', checkAnswer);
             nextQuestionBtn.addEventListener('click', nextQuestion);
+            showCertificateBtn.addEventListener('click', showCertificate);
+            closeCertificateBtn.addEventListener('click', () => certificateModal.classList.add('hidden'));
+            downloadCertBtn.addEventListener('click', downloadCertificate);
+            certificateModal.addEventListener('click', (e) => {
+                if (e.target === certificateModal) {
+                    certificateModal.classList.add('hidden');
+                }
+            });
         
             renderGrammarCards();
         });
