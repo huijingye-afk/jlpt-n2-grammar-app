@@ -1,149 +1,158 @@
-YPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JLPT N2 文法道場</title>
+    <title>珍のN2文法を学ぶ森</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chosen Palette: Dark Charcoal with Neon Teal and Soft Gray -->
-    <!-- Application Structure Plan: The application's structure is a dynamic Single Page Application (SPA) designed to feel like a "digital dojo" or interactive terminal. The primary view is a central dashboard for grammar exploration, with a clear, always-visible navigation at the top to switch to the Quiz section. This approach prioritizes a seamless user flow and prevents jarring page reloads. The main content area is a responsive grid of "data-cards" for the grammar points, which can be filtered in real-time. Clicking a card initiates a smooth, visually distinct modal pop-up, keeping the user in the main view while providing deep-dive details. This non-linear exploration path is chosen to foster curiosity and organic learning, making the vast amount of information less intimidating and more approachable. -->
+    <!-- Chosen Palette: Japanese Natsume (浅绿, 米白, 灰蓝) -->
+    <!-- Application Structure Plan: The application's structure is a calm, single-page experience, designed to feel like a tranquil forest walk. The main sections, "文法図鑑" (Grammar Encyclopedia) and "言葉の遊び場" (Word Playground), are presented with soft transitions to maintain a peaceful flow. The core experience centers around serene, visually pleasing cards that reveal content on click, acting like discoveries in the woods. The layout prioritizes ample whitespace, drawing the user's focus to one element at a time to reduce cognitive load. This non-linear, exploratory design encourages a relaxed, stress-free learning journey. The final quiz-results certificate is transformed into a peaceful "completion scroll" that feels like a personal, quiet achievement rather than a high-pressure test result. -->
     <!-- Visualization & Content Choices: 
         - Report Info: 109 JLPT N2 Grammar points with Chinese explanations and Japanese examples.
-        - Goal 1: Inform & Engage -> Presentation: Interactive, animated cards (HTML/Tailwind) within a responsive grid. The cards have a subtle hover effect (glow, lift). Interaction: Live search input filters the card display instantly. Justification: This design is visually engaging and makes the large number of grammar points feel manageable and fun to explore.
-        - Goal 2: Provide Detailed Reference -> Presentation: A full-screen, semi-transparent modal (HTML/Tailwind/JS) with detailed grammar explanations and examples. Interaction: Triggered by clicking a card and dismissed by an 'x' or an outside click. Justification: The modal provides a focused reading experience for a single grammar point without cluttering the main screen. The dark, transparent overlay fits the tech-dojo theme.
-        - Goal 3: Assess Knowledge (New) -> Presentation: A sentence-rearrangement quiz interface with a word bank and a sentence assembly area. Interaction: User clicks shuffled word blocks to build the correct sentence. The correct answer is revealed upon submission for immediate feedback. The user can also undo a step. Upon quiz completion, a dynamic certificate is generated. Justification: This is a more authentic and effective test of Japanese grammar and sentence structure knowledge compared to simple multiple-choice, providing a more engaging challenge for the user. The certificate adds a sense of achievement and provides a personalized summary of learning progress.
-        - Library/Method: All components and interactions are built with vanilla JavaScript and styled with a dark-themed, custom Tailwind palette. No charting libraries or SVGs are used. -->
+        - Goal 1: Inform & Calm -> Presentation: Soft, card-based grid layout with natural imagery and gentle hover effects. Interaction: Live text search to gently filter cards. Justification: This design leverages visual tranquility and familiar card UI to make the information approachable and non-intimidating, encouraging passive learning and discovery.
+        - Goal 2: Provide Detailed Reference -> Presentation: A gracefully fading modal dialog with soft shadows and clear typography. Interaction: Tapped cards reveal the modal for a focused, private reading session. Justification: The modal's gentle entry/exit animation and minimalist design prevent jarring transitions, keeping the user immersed in the calm atmosphere.
+        - Goal 3: Assess Knowledge & Reflect -> Presentation: A sentence rearrangement quiz with a clean, uncluttered interface. After completion, a downloadable "completion scroll" is generated. Interaction: Users click on words to build a sentence, with an undo option for a low-pressure experience. The final certificate is a unique, personalized visual summary of their journey and progress. Justification: This approach turns the often-anxious process of a quiz into a meditative activity, and the certificate acts as a cherished, beautiful memento of their learning.
+        - Library/Method: All components and interactions are built with vanilla JavaScript and styled with a custom, low-saturation Tailwind palette. No charting libraries or SVGs are used. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
         body {
-            font-family: 'Inter', sans-serif;
-        }
-        .correct-block {
-            background-color: #22c55e;
-            color: #121212;
-            border-color: #16a34a;
-        }
-        .incorrect-block {
-            background-color: #ef4444;
-            color: #121212;
-            border-color: #dc2626;
+            font-family: 'Noto Sans JP', sans-serif;
         }
         .correct-order {
-            box-shadow: 0 0 10px #2dd4bf;
+            box-shadow: 0 0 10px rgba(100, 200, 150, 0.5);
         }
         .word-block {
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease;
         }
         .word-block:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(45, 212, 191, 0.4);
+            box-shadow: 0 4px 12px rgba(100, 200, 150, 0.4);
         }
         .word-block.selected {
             opacity: 0.5;
             cursor: not-allowed;
             pointer-events: none;
         }
-        .modal {
+        .modal-bg {
             transition: opacity 0.3s ease;
         }
+        .modal-content {
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+        .modal-bg.open {
+            opacity: 1;
+        }
+        .modal-content.open {
+            transform: scale(1);
+        }
         .card-hover:hover {
-            box-shadow: 0 0 20px #2dd4bf;
+            box-shadow: 0 0 20px rgba(100, 200, 150, 0.5);
+            transform: translateY(-4px);
         }
         .certificate-border {
-            border: 5px solid #2dd4bf;
-            padding: 2rem;
-            box-shadow: 0 0 20px rgba(45, 212, 191, 0.6);
+            border: 5px solid rgba(100, 200, 150, 0.8);
+            box-shadow: 0 0 20px rgba(100, 200, 150, 0.6);
         }
     </style>
 </head>
-<body class="bg-[#121212] text-stone-200 antialiased">
-
-    <div id="app" class="container mx-auto p-4 md:p-8">
-
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-6xl font-extrabold text-[#2dd4bf] drop-shadow-lg">珍のJLPT N2 文法道場</h1>
-            <p class="text-stone-400 mt-2 text-lg">さあ、文法の修行を始めよう！</p>
+<body class="bg-[#f0f5f0] text-[#4d5c56] antialiased">
+    
+    <div id="app" class="container mx-auto p-6 md:p-12">
+        <header class="text-center mb-16">
+            <h1 class="text-5xl md:text-7xl font-light tracking-wide text-[#8a9990] leading-snug">艺珍のN2 文法<span class="text-[#89b398] font-medium">の森</span></h1>
+            <p class="text-[#a5b2ac] text-lg mt-4 font-light">言葉のささやきに耳を澄ませて</p>
         </header>
 
-        <nav class="flex justify-center rounded-full bg-[#1e1e1e] p-2 mb-12 sticky top-4 z-10 shadow-xl">
-            <button id="nav-library" class="nav-btn px-8 py-3 rounded-full font-semibold transition-all duration-300 text-white bg-[#2dd4bf] shadow-lg shadow-[#2dd4bf]/40">文法ライブラリ</button>
-            <button id="nav-quiz" class="nav-btn px-8 py-3 rounded-full font-semibold transition-all duration-300 text-stone-400 hover:text-white hover:bg-[#2dd4bf] hover:shadow-lg hover:shadow-[#2dd4bf]/40 ml-4">クイズセクション</button>
+        <nav class="flex justify-center rounded-full bg-[#e8ebe6] p-2 mb-16 sticky top-6 z-10 shadow-lg">
+            <button id="nav-library" class="nav-btn px-8 py-3 rounded-full font-light transition-all duration-300 text-[#6a7c73] bg-[#c3d1c4] shadow-md">文法卡片</button>
+            <button id="nav-quiz" class="nav-btn px-8 py-3 rounded-full font-light transition-all duration-300 text-[#a5b2ac] hover:text-[#6a7c73] hover:bg-[#c3d1c4] ml-4">文法练习</button>
         </nav>
 
         <main>
             <section id="library-section">
-                <div class="mb-8">
-                    <input type="text" id="search-input" placeholder="文法を検索 (例: にとって)" class="w-full p-4 text-white bg-[#1e1e1e] border-2 border-stone-700 rounded-xl shadow-inner focus:border-[#2dd4bf] focus:outline-none transition-all duration-300 placeholder-stone-500">
+                <div class="mb-12">
+                    <input type="text" id="search-input" placeholder="小川のせせらぎのように、文法を探す..." class="w-full p-4 text-[#4d5c56] bg-white border-2 border-[#dbe0d7] rounded-xl shadow-inner focus:border-[#89b398] focus:outline-none transition-all duration-300 placeholder-[#a5b2ac] font-light">
                 </div>
-                <div id="grammar-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div id="grammar-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 </div>
             </section>
 
             <section id="quiz-section" class="hidden">
-                <div id="quiz-start-screen" class="text-center bg-[#1e1e1e] p-10 rounded-xl shadow-xl border-2 border-stone-700">
-                    <h2 class="text-3xl font-bold mb-4 text-[#2dd4bf]">文法力每日一测</h2>
-                    <p class="mb-8 text-stone-400">修行の成果を試す時が来た。10問のクイズに挑戦し、文法の腕前を測ろう！</p>
-                    <button id="start-quiz-btn" class="bg-[#2dd4bf] hover:bg-teal-400 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl shadow-[#2dd4bf]/40">クイズ開始！</button>
+                <div id="quiz-start-screen" class="text-center bg-[#e8ebe6] p-12 rounded-xl shadow-xl border-2 border-[#dbe0d7]">
+                    <h2 class="text-4xl font-light mb-4 text-[#89b398]">語順の練習</h2>
+                    <p class="mb-8 text-[#6a7c73] text-lg">木漏れ日を浴びながら、言葉のパズルを解き明かしましょう。</p>
+                    <button id="start-quiz-btn" class="bg-[#89b398] hover:bg-[#a1c4a4] text-white font-light py-4 px-12 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md">始める</button>
                 </div>
 
-                <div id="quiz-question-screen" class="hidden bg-[#1e1e1e] p-8 rounded-xl shadow-xl border-2 border-stone-700">
-                    <div class="flex justify-between items-center mb-4">
-                         <p class="text-sm font-semibold text-stone-500">問題 <span id="question-number"></span>/10</p>
-                         <p id="quiz-feedback" class="text-lg font-bold text-center"></p>
+                <div id="quiz-question-screen" class="hidden bg-[#e8ebe6] p-10 rounded-xl shadow-xl border-2 border-[#dbe0d7]">
+                    <div class="flex justify-between items-center mb-6">
+                         <p class="text-base font-light text-[#a5b2ac]">問い <span id="question-number"></span>/10</p>
+                         <p id="quiz-feedback" class="text-xl font-light text-center"></p>
                     </div>
-                    <div class="w-full bg-stone-700 rounded-full h-3 mb-8 shadow-inner">
-                        <div id="progress-bar" class="bg-[#2dd4bf] h-3 rounded-full transition-all duration-500 shadow-md shadow-[#2dd4bf]/40" style="width: 0%"></div>
-                    </div>
-
-                    <div class="text-lg md:text-xl mb-8 min-h-[96px] flex items-center justify-center p-4 bg-[#242424] rounded-lg border-2 border-stone-700" id="sentence-assembly">
-                        <span class="text-stone-500">ここに語順を並べてみましょう</span>
+                    <div class="w-full bg-[#dbe0d7] rounded-full h-2 mb-10 shadow-inner">
+                        <div id="progress-bar" class="bg-[#89b398] h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
 
-                    <div class="flex flex-wrap justify-center items-center gap-2 md:gap-4 mb-6" id="word-bank"></div>
+                    <div class="text-lg md:text-xl mb-8 min-h-[96px] flex items-center justify-center p-6 bg-white rounded-lg border-2 border-[#dbe0d7]" id="sentence-assembly">
+                        <span class="text-[#a5b2ac]">ここに言葉を並べてみましょう</span>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center items-center gap-3 md:gap-4 mb-8" id="word-bank"></div>
 
                     <div class="flex justify-center items-center mt-8 space-x-4">
-                        <button id="undo-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">やり直し</button>
-                        <button id="check-answer-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">答え合わせ</button>
-                        <button id="next-question-btn" class="bg-[#2dd4bf] hover:bg-teal-400 text-stone-800 font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hidden">次の問題へ</button>
+                        <button id="undo-btn" class="bg-[#c3d1c4] hover:bg-[#dbe0d7] text-[#6a7c73] font-light py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">一つ戻る</button>
+                        <button id="check-answer-btn" class="bg-[#c3d1c4] hover:bg-[#dbe0d7] text-[#6a7c73] font-light py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">答え合わせ</button>
+                        <button id="next-question-btn" class="bg-[#89b398] hover:bg-[#a1c4a4] text-white font-light py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hidden">次の問題へ</button>
                     </div>
                 </div>
 
-                <div id="quiz-results-screen" class="hidden text-center bg-[#1e1e1e] p-10 rounded-xl shadow-xl border-2 border-stone-700">
-                    <h2 class="text-3xl font-bold mb-4 text-[#2dd4bf]">修行の成果！</h2>
-                    <p class="text-6xl font-extrabold my-8 text-white"><span id="quiz-score"></span> / 10</p>
-                    <p id="quiz-result-message" class="text-lg mb-8 text-stone-400"></p>
-                    <button id="show-certificate-btn" class="bg-[#2dd4bf] hover:bg-teal-400 text-stone-800 font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl shadow-[#2dd4bf]/40">認定証を受け取る</button>
-                    <button id="restart-quiz-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 mt-4">再挑戦！</button>
+                <div id="quiz-results-screen" class="hidden text-center bg-[#e8ebe6] p-12 rounded-xl shadow-xl border-2 border-[#dbe0d7]">
+                    <h2 class="text-4xl font-light mb-4 text-[#89b398]">今日の収穫</h2>
+                    <p class="text-6xl font-extralight my-8 text-[#4d5c56]"><span id="quiz-score"></span> / 10</p>
+                    <p id="quiz-result-message" class="text-lg mb-8 text-[#6a7c73]"></p>
+                    <button id="show-certificate-btn" class="bg-[#89b398] hover:bg-[#a1c4a4] text-white font-light py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md">言葉の勲章を授かる</button>
+                    <button id="restart-quiz-btn" class="bg-[#c3d1c4] hover:bg-[#dbe0d7] text-[#6a7c73] font-light py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 mt-4">もう一度、森へ</button>
                 </div>
             </section>
         </main>
     </div>
 
-    <div id="certificate-modal" class="modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 hidden">
-        <div id="certificate-content" class="bg-[#1e1e1e] rounded-xl shadow-2xl p-6 md:p-10 max-w-xl w-full text-center relative">
-            <button id="close-certificate-btn" class="absolute top-4 right-4 text-stone-500 hover:text-white text-3xl transition-colors duration-200">&times;</button>
+    <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50 opacity-0 hidden modal-bg">
+        <div id="modal-content" class="bg-white rounded-xl shadow-2xl p-6 md:p-10 max-w-3xl w-full max-h-[90vh] overflow-y-auto transform scale-95 transition-all duration-300 modal-content">
+            <div class="flex justify-end items-center mb-4">
+                <button id="close-modal-btn" class="text-[#a5b2ac] hover:text-[#6a7c73] text-4xl transition-colors duration-200 leading-none">&times;</button>
+            </div>
+            <div id="modal-inner-content" class="prose max-w-none text-[#4d5c56]"></div>
+        </div>
+    </div>
+    
+    <div id="certificate-modal" class="modal-bg fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50 hidden">
+        <div id="certificate-content" class="modal-content bg-[#e8ebe6] rounded-xl shadow-2xl p-8 md:p-12 max-w-xl w-full text-center relative">
+            <button id="close-certificate-btn" class="absolute top-4 right-4 text-[#a5b2ac] hover:text-[#6a7c73] text-4xl transition-colors duration-200 leading-none">&times;</button>
             <div class="certificate-border p-8">
-                <h2 class="text-3xl font-bold text-[#2dd4bf] mb-2">JLPT N2 文法道場</h2>
-                <h3 class="text-2xl font-bold text-stone-300 mb-6">認定証</h3>
+                <h2 class="text-4xl font-light text-[#89b398] mb-2">言葉の勲章</h2>
+                <h3 class="text-2xl font-light text-[#6a7c73] mb-6">N2文法 修行完了</h3>
                 
-                <div class="text-left space-y-4 text-stone-400 mb-8">
-                    <p>本日：<span id="cert-date" class="text-white font-semibold"></span></p>
-                    <p>貴方はN2文法クイズに挑戦し、見事に<span id="cert-score" class="text-white font-semibold text-2xl"></span>点という成績を収めました。</p>
-                    <p id="cert-message" class="text-white font-semibold text-lg italic"></p>
-                    <p class="text-stone-500 mt-6">今回の結果を踏まえ、更なる高みを目指し、今後も日本語の修行に励むことを期待します。</p>
+                <div class="text-left space-y-4 text-[#6a7c73] mb-8 font-light">
+                    <p>本日：<span id="cert-date" class="text-[#4d5c56] font-normal"></span></p>
+                    <p>言葉の森を歩みし者よ、<br>貴方の探求心と努力をここに称える。</p>
+                    <p id="cert-score" class="text-[#4d5c56] font-normal text-3xl my-4"></p>
+                    <p id="cert-message" class="text-[#4d5c56] text-lg italic mt-4"></p>
                 </div>
 
                 <div id="cert-errors-section" class="text-left hidden mb-8">
-                    <h4 class="text-xl font-bold text-[#ef4444] mb-2">要復習の文法：</h4>
-                    <ul id="cert-errors-list" class="list-disc list-inside space-y-1 text-stone-400"></ul>
+                    <h4 class="text-xl font-light text-[#cc9999] mb-2">再訪すべき文法：</h4>
+                    <ul id="cert-errors-list" class="list-disc list-inside space-y-1 text-[#6a7c73]"></ul>
                 </div>
 
-                <div class="text-stone-500 mt-8">
-                    <p class="font-bold">文法道場 珍珍</p>
+                <div class="text-[#a5b2ac] mt-8 font-light text-sm">
+                    <p>森の主 珍珍より</p>
                 </div>
             </div>
-            <button id="download-cert-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 mt-6">画像として保存</button>
+            <button id="download-cert-btn" class="bg-[#c3d1c4] hover:bg-[#dbe0d7] text-[#6a7c73] font-light py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 mt-6">想い出を形に</button>
         </div>
     </div>
     
@@ -260,7 +269,7 @@ YPE html>
             { id: 108, grammar: '～ようがない', meaning: '无法…', nuance: '「～する方法がない、～できない」/没有…的方法，无法…', examples: ['この問題は、どうしようもない。/这个问题，没有办法解决。', '彼の悲しみを、慰めようがない。/他的悲伤，无法安慰。', 'この状況では、何も言おうがない。/在这种情况下，没有什么可说的。'], parts: [['この問題は', 'どう', 'しようが', 'ない'], ['彼の', '悲しみを', '慰め', 'ようが', 'ない'], ['この状況では', '何も', '言おうが', 'ない']] },
             { id: 109, grammar: '～かねない', meaning: '很可能…(负面)', nuance: '「～する可能性がある」/有…的可能性（负面）', examples: ['こんなに遅いと、終電に乗り遅れかねない。/这么晚，很可能会赶不上末班车。', '彼の性格からすると、文句を言いかねない。/从他的性格来看，很可能会抱怨。', 'このままでは、事故を起こしかねない。/这样下去，很可能会发生事故。'], parts: [['こんなに', '遅いと', '終電に', '乗り遅れ', 'かねない'], ['彼の', '性格から', 'すると', '文句を', '言い', 'かねない'], ['このままでは', '事故を', '起こし', 'かねない']] }
         ];
-
+        
         document.addEventListener('DOMContentLoaded', () => {
             const navLibrary = document.getElementById('nav-library');
             const navQuiz = document.getElementById('nav-quiz');
@@ -280,6 +289,9 @@ YPE html>
             const wordBankEl = document.getElementById('word-bank');
             const sentenceAssemblyEl = document.getElementById('sentence-assembly');
             const quizFeedbackEl = document.getElementById('quiz-feedback');
+            const modalContainer = document.getElementById('modal-container');
+            const modalInnerContent = document.getElementById('modal-inner-content');
+            const closeModalBtn = document.getElementById('close-modal-btn');
             const showCertificateBtn = document.getElementById('show-certificate-btn');
             const certificateModal = document.getElementById('certificate-modal');
             const closeCertificateBtn = document.getElementById('close-certificate-btn');
@@ -292,20 +304,20 @@ YPE html>
             function showSection(sectionId) {
                 const navBtns = document.querySelectorAll('.nav-btn');
                 navBtns.forEach(btn => {
-                    btn.classList.remove('bg-[#2dd4bf]', 'text-white', 'shadow-lg', 'shadow-[#2dd4bf]/40');
-                    btn.classList.add('text-stone-400', 'hover:text-white', 'hover:bg-[#2dd4bf]', 'hover:shadow-lg', 'hover:shadow-[#2dd4bf]/40');
+                    btn.classList.remove('bg-[#c3d1c4]', 'text-[#6a7c73]', 'shadow-md');
+                    btn.classList.add('text-[#a5b2ac]', 'hover:text-[#6a7c73]', 'hover:bg-[#c3d1c4]');
                 });
         
                 if (sectionId === 'library') {
                     librarySection.classList.remove('hidden');
                     quizSection.classList.add('hidden');
-                    navLibrary.classList.add('bg-[#2dd4bf]', 'text-white', 'shadow-lg', 'shadow-[#2dd4bf]/40');
-                    navLibrary.classList.remove('text-stone-400', 'hover:text-white', 'hover:bg-[#2dd4bf]', 'hover:shadow-lg', 'hover:shadow-[#2dd4bf]/40');
+                    navLibrary.classList.add('bg-[#c3d1c4]', 'text-[#6a7c73]', 'shadow-md');
+                    navLibrary.classList.remove('text-[#a5b2ac]', 'hover:text-[#6a7c73]', 'hover:bg-[#c3d1c4]');
                 } else {
                     librarySection.classList.add('hidden');
                     quizSection.classList.remove('hidden');
-                    navQuiz.classList.add('bg-[#2dd4bf]', 'text-white', 'shadow-lg', 'shadow-[#2dd4bf]/40');
-                    navQuiz.classList.remove('text-stone-400', 'hover:text-white', 'hover:bg-[#2dd4bf]', 'hover:shadow-lg', 'hover:shadow-[#2dd4bf]/40');
+                    navQuiz.classList.add('bg-[#c3d1c4]', 'text-[#6a7c73]', 'shadow-md');
+                    navQuiz.classList.remove('text-[#a5b2ac]', 'hover:text-[#6a7c73]', 'hover:bg-[#c3d1c4]');
                 }
             }
         
@@ -319,19 +331,19 @@ YPE html>
                 );
         
                 if (filteredData.length === 0) {
-                    grammarGrid.innerHTML = `<p class="text-stone-500 col-span-full text-center mt-8">該当する文法が見つかりませんでした。</p>`;
+                    grammarGrid.innerHTML = `<p class="text-[#a5b2ac] col-span-full text-center mt-8">ごめんなさい、文法が見つかりませんでした。</p>`;
                     return;
                 }
         
                 filteredData.forEach(item => {
                     const card = document.createElement('div');
-                    card.className = 'bg-[#1e1e1e] rounded-xl shadow-lg p-6 flex flex-col justify-between border-2 border-stone-700 cursor-pointer transition-all duration-300 transform hover:-translate-y-2 card-hover';
+                    card.className = 'bg-[#e8ebe6] rounded-xl shadow-lg p-6 flex flex-col justify-between border-2 border-[#dbe0d7] cursor-pointer transition-all duration-300 transform hover:-translate-y-2 card-hover';
                     card.innerHTML = `
-                        <div>
-                            <h3 class="text-xl font-bold text-[#2dd4bf]">${item.id}. ${item.grammar}</h3>
-                            <p class="text-stone-300 mt-2">${item.meaning}</p>
+                        <div><h3 class="text-xl font-semibold text-[#4d5c56]">${item.id}. ${item.grammar}</h3>
+                            
+                            <p class="text-[#4d5c56] mt-2">${item.meaning}</p>
                         </div>
-                        <p class="text-sm text-stone-500 mt-4 self-start">${item.nuance.split('/')[0]}</p>
+                        <p class="text-sm text-[#4d5c56] mt-4 self-start">${item.nuance.split('/')[0]}</p>
                     `;
                     card.addEventListener('click', () => showModal(item));
                     grammarGrid.appendChild(card);
@@ -339,48 +351,33 @@ YPE html>
             }
         
             function showModal(item) {
-                const modal = document.createElement('div');
-                modal.className = 'modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 z-50 opacity-0 transition-opacity duration-300';
-                modal.innerHTML = `
-                    <div class="bg-[#1e1e1e] rounded-xl shadow-2xl p-6 md:p-10 max-w-3xl w-full max-h-[90vh] overflow-y-auto border-2 border-[#2dd4bf] transform scale-95 transition-all duration-300">
-                        <div class="flex justify-between items-center mb-4">
-                            <div>
-                                <h2 class="text-2xl md:text-3xl font-bold text-[#2dd4bf]">${item.id}. ${item.grammar}</h2>
-                                <p class="text-stone-300 font-semibold mt-1">${item.meaning}</p>
-                            </div>
-                            <button id="close-modal-btn" class="text-stone-500 hover:text-white text-3xl transition-colors duration-200">&times;</button>
-                        </div>
-                        <div class="prose max-w-none text-stone-300">
-                            <p class="bg-[#242424] p-4 rounded-lg"><strong>ニュアンス：</strong> ${item.nuance.split('/')[0]} <br> <strong>中文解释：：</strong> ${item.nuance.split('/')[1]}</p>
-                            <h4 class="font-semibold mt-8 mb-4 text-[#2dd4bf] text-xl">例文：</h4>
-                            <ul class="list-disc list-inside space-y-4 text-stone-300">
-                                ${item.examples.map(ex => {
-                                    const [ja, zh] = ex.split('/');
-                                    return `<li><span class="text-white">${ja}</span><br><span class="text-stone-500 text-sm mt-1 block">${zh}</span></li>`;
-                                }).join('')}
-                            </ul>
-                        </div>
+                const modal = modalContainer;
+                modalInnerContent.innerHTML = `
+                    <div class="prose max-w-none text-[#4d5c56]">
+                        <h2 class="text-2xl md:text-3xl font-light text-[#89b398]">${item.id}. ${item.grammar}</h2>
+                        <p class="text-[#4d5c56] font-normal mt-1 mb-6">${item.meaning}</p>
+                        <p class="bg-[#f0f5f0] p-4 rounded-lg text-sm"><strong>ニュアンス：</strong> ${item.nuance.split('/')[0]} <br> <strong>中文解释：：</strong> ${item.nuance.split('/')[1]}</p>
+                        <h4 class="font-normal mt-8 mb-4 text-[#89b398] text-xl">例文：</h4>
+                        <ul class="list-disc list-inside space-y-4 text-[#4d5c56]">
+                            ${item.examples.map(ex => {
+                                const [ja, zh] = ex.split('/');
+                                return `<li><span class="text-[#4d5c56]">${ja}</span><br><span class="text-[#a5b2ac] text-sm mt-1 block">${zh}</span></li>`;
+                            }).join('')}
+                        </ul>
                     </div>
                 `;
-                document.body.appendChild(modal);
                 
+                modal.classList.remove('hidden', 'opacity-0');
                 requestAnimationFrame(() => {
-                   modal.classList.remove('opacity-0');
-                   modal.querySelector('.transform').classList.remove('scale-95');
-                });
-        
-                modal.querySelector('#close-modal-btn').addEventListener('click', () => closeModal(modal));
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        closeModal(modal);
-                    }
+                   modal.classList.add('opacity-100');
+                   modal.querySelector('.modal-content').classList.add('open');
                 });
             }
             
             function closeModal(modal) {
-                modal.classList.add('opacity-0');
-                modal.querySelector('.transform').classList.add('scale-95');
-                modal.addEventListener('transitionend', () => modal.remove(), { once: true });
+                modal.classList.remove('opacity-100');
+                modal.querySelector('.modal-content').classList.remove('open');
+                modal.addEventListener('transitionend', () => modal.classList.add('hidden'), { once: true });
             }
         
             function startQuiz() {
@@ -390,7 +387,6 @@ YPE html>
                     currentQuestionIndex: 0,
                     score: 0,
                     userAnswer: [],
-                    correctAnswer: [],
                     incorrect: []
                 };
                 quizStartScreen.classList.add('hidden');
@@ -417,11 +413,11 @@ YPE html>
                 selectedBlocks = [];
                 
                 document.getElementById('question-number').textContent = state.currentQuestionIndex + 1;
-                sentenceAssemblyEl.innerHTML = `<span class="text-stone-500">ここに語順を並べてみましょう</span>`;
+                sentenceAssemblyEl.innerHTML = `<span class="text-[#a5b2ac]">ここに言葉を並べてみましょう</span>`;
                 wordBankEl.innerHTML = '';
                 shuffledParts.forEach((part, index) => {
                     const block = document.createElement('button');
-                    block.className = 'word-block bg-[#2dd4bf] text-stone-800 font-semibold py-2 px-4 rounded-lg transition-transform duration-200';
+                    block.className = 'word-block bg-[#c3d1c4] text-[#6a7c73] font-light py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105';
                     block.textContent = part;
                     block.dataset.originalIndex = index;
                     block.addEventListener('click', () => assembleSentence(block, part));
@@ -430,8 +426,8 @@ YPE html>
         
                 quizFeedbackEl.textContent = '';
                 checkAnswerBtn.classList.remove('hidden');
-                checkAnswerBtn.classList.remove('bg-[#2dd4bf]', 'hover:bg-teal-400');
-                checkAnswerBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                checkAnswerBtn.classList.remove('bg-[#89b398]', 'hover:bg-[#a1c4a4]', 'text-white');
+                checkAnswerBtn.classList.add('bg-[#c3d1c4]', 'hover:bg-[#dbe0d7]', 'text-[#6a7c73]');
                 nextQuestionBtn.classList.add('hidden');
                 undoBtn.classList.remove('hidden');
                 
@@ -443,11 +439,11 @@ YPE html>
                 const state = currentQuizState;
                 if (state.userAnswer.length === 0) {
                     sentenceAssemblyEl.innerHTML = '';
-                    sentenceAssemblyEl.classList.remove('text-stone-500');
+                    sentenceAssemblyEl.classList.remove('text-[#a5b2ac]');
                 }
                 
                 const assembledBlock = document.createElement('span');
-                assembledBlock.className = 'py-2 px-3 m-1 bg-[#242424] text-stone-300 rounded-md';
+                assembledBlock.className = 'py-2 px-3 m-1 bg-[#dbe0d7] text-[#4d5c56] rounded-full font-light';
                 assembledBlock.textContent = part;
                 assembledBlock.dataset.originalIndex = block.dataset.originalIndex;
                 sentenceAssemblyEl.appendChild(assembledBlock);
@@ -457,32 +453,33 @@ YPE html>
                 block.classList.add('selected');
                 
                 if (state.userAnswer.length === state.correctAnswer.length) {
-                    checkAnswerBtn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
-                    checkAnswerBtn.classList.add('bg-[#2dd4bf]', 'hover:bg-teal-400');
+                    checkAnswerBtn.classList.remove('bg-[#c3d1c4]', 'hover:bg-[#dbe0d7]', 'text-[#6a7c73]');
+                    checkAnswerBtn.classList.add('bg-[#89b398]', 'hover:bg-[#a1c4a4]', 'text-white');
                 } else {
-                    checkAnswerBtn.classList.remove('bg-[#2dd4bf]', 'hover:bg-teal-400');
-                    checkAnswerBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                    checkAnswerBtn.classList.remove('bg-[#89b398]', 'hover:bg-[#a1c4a4]', 'text-white');
+                    checkAnswerBtn.classList.add('bg-[#c3d1c4]', 'hover:bg-[#dbe0d7]', 'text-[#6a7c73]');
                 }
             }
 
             function undoLastAction() {
                 const state = currentQuizState;
                 if (state.userAnswer.length > 0) {
-                    const lastWord = state.userAnswer.pop();
+                    state.userAnswer.pop();
                     const lastBlock = selectedBlocks.pop();
                     
                     sentenceAssemblyEl.removeChild(sentenceAssemblyEl.lastChild);
                     lastBlock.classList.remove('selected');
                     
                     if (state.userAnswer.length === 0) {
-                        sentenceAssemblyEl.innerHTML = `<span class="text-stone-500">ここに語順を並べてみましょう</span>`;
-                        checkAnswerBtn.classList.remove('bg-[#2dd4bf]', 'hover:bg-teal-400');
-                        checkAnswerBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                        sentenceAssemblyEl.innerHTML = `<span class="text-[#a5b2ac]">ここに言葉を並べてみましょう</span>`;
                     }
                     
-                    if (state.userAnswer.length !== state.correctAnswer.length) {
-                        checkAnswerBtn.classList.remove('bg-[#2dd4bf]', 'hover:bg-teal-400');
-                        checkAnswerBtn.classList.add('bg-gray-600', 'hover:bg-gray-700');
+                    if (state.userAnswer.length === state.correctAnswer.length) {
+                        checkAnswerBtn.classList.remove('bg-[#c3d1c4]', 'hover:bg-[#dbe0d7]', 'text-[#6a7c73]');
+                        checkAnswerBtn.classList.add('bg-[#89b398]', 'hover:bg-[#a1c4a4]', 'text-white');
+                    } else {
+                        checkAnswerBtn.classList.remove('bg-[#89b398]', 'hover:bg-[#a1c4a4]', 'text-white');
+                        checkAnswerBtn.classList.add('bg-[#c3d1c4]', 'hover:bg-[#dbe0d7]', 'text-[#6a7c73]');
                     }
                 }
             }
@@ -490,28 +487,30 @@ YPE html>
             function checkAnswer() {
                 const state = currentQuizState;
                 const feedbackEl = document.getElementById('quiz-feedback');
-                
                 const isCorrect = JSON.stringify(state.userAnswer) === JSON.stringify(state.correctAnswer);
                 
                 if (isCorrect) {
                     state.score++;
                     feedbackEl.textContent = '正解！';
-                    feedbackEl.className = 'text-lg font-bold text-green-500';
+                    feedbackEl.className = 'text-xl font-light text-[#89b398]';
                     sentenceAssemblyEl.classList.add('correct-order');
                 } else {
                     feedbackEl.textContent = '不正解';
-                    feedbackEl.className = 'text-lg font-bold text-red-500';
+                    feedbackEl.className = 'text-xl font-light text-[#cc9999]';
+                    const [jaExample] = state.currentExample.split('/');
+                    const [jaGrammar] = state.questions[state.currentQuestionIndex].grammar.split('/');
                     state.incorrect.push({
-                        grammar: state.questions[state.currentQuestionIndex].grammar,
-                        example: state.currentExample
+                        grammar: jaGrammar,
+                        example: jaExample,
+                        fullExample: state.currentExample
                     });
                 }
                 
                 const [ja, zh] = state.currentExample.split('/');
                 sentenceAssemblyEl.innerHTML = `
-                    <p class="text-white text-lg font-semibold">${ja}</p>
-                    <p class="text-stone-400 text-sm mt-1">${zh}</p>
-                    <p class="text-[#2dd4bf] text-sm mt-2 font-bold">${state.questions[state.currentQuestionIndex].grammar}</p>
+                    <p class="text-[#4d5c56] text-lg font-light">${ja}</p>
+                    <p class="text-[#a5b2ac] text-sm mt-1">${zh}</p>
+                    <p class="text-[#89b398] text-sm mt-2 font-normal">文法：${state.questions[state.currentQuestionIndex].grammar}</p>
                 `;
                 
                 const allBlocks = document.querySelectorAll('.word-block');
@@ -532,17 +531,18 @@ YPE html>
                 document.getElementById('progress-bar').style.width = '100%';
                 quizQuestionScreen.classList.add('hidden');
                 quizResultsScreen.classList.remove('hidden');
-                document.getElementById('quiz-score').textContent = state.score;
+                
+                document.getElementById('quiz-score').textContent = `正解数: ${state.score} / 10`;
                 
                 const messageEl = document.getElementById('quiz-result-message');
                 if (state.score === 10) {
-                    messageEl.textContent = '完璧です！あなたは文法の達人ですね。';
+                    messageEl.textContent = '完璧ですね！文法という大樹を、見事に育て上げました。';
                 } else if (state.score >= 7) {
-                    messageEl.textContent = '素晴らしい成績です！この調子で頑張りましょう。';
+                    messageEl.textContent = '素晴らしい成績です！着実に言葉の森を歩んでいますね。';
                 } else if (state.score >= 4) {
-                    messageEl.textContent = 'まずまずですね。復習すればもっと良くなりますよ。';
+                    messageEl.textContent = 'よく頑張りました。間違えた道も、学びの糧となります。';
                 } else {
-                    messageEl.textContent = 'まだまだ伸びしろがありますね。文法ライブラリで復習しましょう！';
+                    messageEl.textContent = '道はまだ遠いですが、一歩一歩、確実に進んでいきましょう。';
                 }
             }
 
@@ -553,17 +553,17 @@ YPE html>
                 const today = new Date();
                 const dateString = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
                 document.getElementById('cert-date').textContent = dateString;
-                document.getElementById('cert-score').textContent = state.score;
+                document.getElementById('cert-score').textContent = `${state.score}点`;
 
                 const messageEl = document.getElementById('cert-message');
                 if (state.score === 10) {
-                    messageEl.textContent = '全問正解！素晴らしい集中力と知識です。';
+                    messageEl.textContent = '全問正解！言葉の森に、あなたの名前が刻まれました。';
                 } else if (state.score >= 7) {
-                    messageEl.textContent = '優秀な成績です！この調子で、更なる高みを目指しましょう。';
+                    messageEl.textContent = '言葉の木は、着実に根を張っています。';
                 } else if (state.score >= 4) {
-                    messageEl.textContent = 'よく頑張りました。次のステップは、間違えた文法の復習です。';
+                    messageEl.textContent = 'あなたの努力は、森の恵みとして実を結びます。';
                 } else {
-                    messageEl.textContent = 'あなたの努力は無駄になりません。復習を重ね、強くなろう！';
+                    messageEl.textContent = '雨上がりの森のように、希望はそこにあります。';
                 }
 
                 const errorsListEl = document.getElementById('cert-errors-list');
@@ -572,8 +572,8 @@ YPE html>
                     document.getElementById('cert-errors-section').classList.remove('hidden');
                     state.incorrect.forEach(item => {
                         const li = document.createElement('li');
-                        li.className = 'text-stone-400';
-                        li.innerHTML = `<strong>${item.grammar}</strong>: <span class="text-sm italic">${item.example.split('/')[0]}</span>`;
+                        li.className = 'text-[#6a7c73] font-light';
+                        li.innerHTML = `「${item.grammar}」：${item.example}`;
                         errorsListEl.appendChild(li);
                     });
                 } else {
@@ -585,15 +585,15 @@ YPE html>
                 const content = document.getElementById('certificate-content');
                 const originalBgColor = content.style.backgroundColor;
                 const originalBoxShadow = content.style.boxShadow;
-                content.style.backgroundColor = '#1e1e1e';
+                content.style.backgroundColor = '#e8ebe6';
                 content.style.boxShadow = 'none';
 
                 html2canvas(content, {
-                    backgroundColor: '#1e1e1e',
+                    backgroundColor: '#e8ebe6',
                     scale: 2
                 }).then(canvas => {
                     const link = document.createElement('a');
-                    link.download = 'JLPT_N2_Certificate.png';
+                    link.download = 'N2_Certificate.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                     content.style.backgroundColor = originalBgColor;
@@ -610,8 +610,14 @@ YPE html>
             checkAnswerBtn.addEventListener('click', checkAnswer);
             nextQuestionBtn.addEventListener('click', nextQuestion);
             showCertificateBtn.addEventListener('click', showCertificate);
+            closeModalBtn.addEventListener('click', () => closeModal(modalContainer));
             closeCertificateBtn.addEventListener('click', () => certificateModal.classList.add('hidden'));
             downloadCertBtn.addEventListener('click', downloadCertificate);
+            modalContainer.addEventListener('click', (e) => {
+                if (e.target === modalContainer) {
+                    closeModal(modalContainer);
+                }
+            });
             certificateModal.addEventListener('click', (e) => {
                 if (e.target === certificateModal) {
                     certificateModal.classList.add('hidden');
