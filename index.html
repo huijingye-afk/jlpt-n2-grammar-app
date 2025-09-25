@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>珍のN2文法を学ぶ森</title>
+    <title>N2文法を学ぶ森</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chosen Palette: Japanese Natsume (浅绿, 米白, 灰蓝) -->
     <!-- Application Structure Plan: The application's structure is a calm, single-page experience, designed to feel like a tranquil forest walk. The main sections, "文法図鑑" (Grammar Encyclopedia) and "言葉の遊び場" (Word Playground), are presented with soft transitions to maintain a peaceful flow. The core experience centers around serene, visually pleasing cards that reveal content on click, acting like discoveries in the woods. The layout prioritizes ample whitespace, drawing the user's focus to one element at a time to reduce cognitive load. This non-linear, exploratory design encourages a relaxed, stress-free learning journey. The final quiz-results certificate is transformed into a peaceful "completion scroll" that feels like a personal, quiet achievement rather than a high-pressure test result. -->
@@ -62,19 +62,24 @@
     
     <div id="app" class="container mx-auto p-6 md:p-12">
         <header class="text-center mb-16">
-            <h1 class="text-5xl md:text-7xl font-light tracking-wide text-[#8a9990] leading-snug">艺珍のN2 文法<span class="text-[#89b398] font-medium">の森</span></h1>
+            <h1 class="text-5xl md:text-7xl font-light tracking-wide text-[#8a9990] leading-snug">艺珍の文法の森<span class="text-[#89b398] font-medium">の森</span></h1>
             <p class="text-[#a5b2ac] text-lg mt-4 font-light">言葉のささやきに耳を澄ませて</p>
         </header>
 
-        <nav class="flex justify-center rounded-full bg-[#e8ebe6] p-2 mb-16 sticky top-6 z-10 shadow-lg">
+        <nav class="flex justify-center rounded-full bg-[#e8ebe6] p-2 mb-12 sticky top-6 z-10 shadow-lg">
             <button id="nav-library" class="nav-btn px-8 py-3 rounded-full font-light transition-all duration-300 text-[#6a7c73] bg-[#c3d1c4] shadow-md">文法卡片</button>
             <button id="nav-quiz" class="nav-btn px-8 py-3 rounded-full font-light transition-all duration-300 text-[#a5b2ac] hover:text-[#6a7c73] hover:bg-[#c3d1c4] ml-4">文法练习</button>
         </nav>
+        
+        <div class="flex justify-center mb-12 space-x-4">
+            <button class="level-btn px-6 py-2 rounded-full font-light transition-all duration-300 bg-[#c3d1c4] text-[#6a7c73] shadow-md" data-level="N5/N4">N5/N4</button>
+            <button class="level-btn px-6 py-2 rounded-full font-light transition-all duration-300 bg-white text-[#a5b2ac] hover:bg-[#c3d1c4] hover:text-[#6a7c73]" data-level="N2">N2</button>
+        </div>
 
         <main>
             <section id="library-section">
                 <div class="mb-12">
-                    <input type="text" id="search-input" placeholder="小川のせせらぎのように、文法を探す..." class="w-full p-4 text-[#4d5c56] bg-white border-2 border-[#dbe0d7] rounded-xl shadow-inner focus:border-[#89b398] focus:outline-none transition-all duration-300 placeholder-[#a5b2ac] font-light">
+                    <input type="text" id="search-input" placeholder="小川のせせらぎのように、文法を探す（检索文法）..." class="w-full p-4 text-[#4d5c56] bg-white border-2 border-[#dbe0d7] rounded-xl shadow-inner focus:border-[#89b398] focus:outline-none transition-all duration-300 placeholder-[#a5b2ac] font-light">
                 </div>
                 <div id="grammar-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 </div>
@@ -97,7 +102,7 @@
                     </div>
 
                     <div class="text-lg md:text-xl mb-8 min-h-[96px] flex items-center justify-center p-6 bg-white rounded-lg border-2 border-[#dbe0d7]" id="sentence-assembly">
-                        <span class="text-[#a5b2ac]">ここに言葉を並べてみましょう</span>
+                        <span class="text-[#a5b2ac]">ここに言葉を並べてみましょう（排序）</span>
                     </div>
 
                     <div class="flex flex-wrap justify-center items-center gap-3 md:gap-4 mb-8" id="word-bank"></div>
@@ -110,11 +115,11 @@
                 </div>
 
                 <div id="quiz-results-screen" class="hidden text-center bg-[#e8ebe6] p-12 rounded-xl shadow-xl border-2 border-[#dbe0d7]">
-                    <h2 class="text-4xl font-light mb-4 text-[#89b398]">今日の収穫</h2>
+                    <h2 class="text-4xl font-light mb-4 text-[#89b398]">今日文法学习证书</h2>
                     <p class="text-6xl font-extralight my-8 text-[#4d5c56]"><span id="quiz-score"></span> / 10</p>
                     <p id="quiz-result-message" class="text-lg mb-8 text-[#6a7c73]"></p>
-                    <button id="show-certificate-btn" class="bg-[#89b398] hover:bg-[#a1c4a4] text-white font-light py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md">証書を授かる</button>
-                    <button id="restart-quiz-btn" class="bg-[#c3d1c4] hover:bg-[#dbe0d7] text-[#6a7c73] font-light py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 mt-4">もう一度、練習へ</button>
+                    <button id="show-certificate-btn" class="bg-[#89b398] hover:bg-[#a1c4a4] text-white font-light py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md">获取学习证明</button>
+                    <button id="restart-quiz-btn" class="bg-[#c3d1c4] hover:bg-[#dbe0d7] text-[#6a7c73] font-light py-4 px-10 rounded-full transition-all duration-300 transform hover:scale-105 mt-4">再挑战一次</button>
                 </div>
             </section>
         </main>
@@ -133,8 +138,8 @@
         <div id="certificate-content" class="modal-content bg-[#e8ebe6] rounded-xl shadow-2xl p-8 md:p-12 max-w-xl w-full text-center relative">
             <button id="close-certificate-btn" class="absolute top-4 right-4 text-[#a5b2ac] hover:text-[#6a7c73] text-4xl transition-colors duration-200 leading-none">&times;</button>
             <div class="certificate-border p-8">
-                <h2 class="text-4xl font-light text-[#89b398] mb-2">文法証書</h2>
-                <h3 class="text-2xl font-light text-[#6a7c73] mb-6">N2文法 修行完了</h3>
+                <h2 class="text-4xl font-light text-[#89b398] mb-2">学习证书</h2>
+                <h3 class="text-2xl font-light text-[#6a7c73] mb-6">今日文法 修行完了</h3>
                 
                 <div class="text-left space-y-4 text-[#6a7c73] mb-8 font-light">
                     <p>本日：<span id="cert-date" class="text-[#4d5c56] font-normal"></span></p>
@@ -152,18 +157,18 @@
                     <p>森の主 珍珍より</p>
                 </div>
             </div>
-            <button id="download-cert-btn" class="bg-[#c3d1c4] hover:bg-[#dbe0d7] text-[#6a7c73] font-light py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 mt-6">想い出を形に</button>
+            <button id="download-cert-btn" class="bg-[#c3d1c4] hover:bg-[#dbe0d7] text-[#6a7c73] font-light py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 mt-6">保存证书</button>
         </div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        const grammarData = [
-            { id: 1, grammar: '～からといって', meaning: '虽说…但不…', nuance: '100％ではない，正しい理由にならない/不是百分之百，不能成为正当理由，虽说…却不… 不要因为…而…', examples: ['金持ちだからといって、幸せとはかぎらない。/虽说有钱，但未必幸福。', '遊びたいからといって、学校を休むことはできない。/虽说想玩，但不能因此而不去上学。', '日本人だからといって、誰もが敬語を正しく使えるというわけではない。/虽说日本人，但并非人人都能正确使用敬语。'], parts: [['金持ち', 'だからといって', '幸せとは', 'かぎらない'], ['遊びたい', 'からといって', '学校を', '休むことは', 'できない'], ['日本人', 'だからといって', '誰もが', '敬語を', '正しく', '使えるというわけではない']] },
+        const grammarDataN2 = [
+            { id: 1, grammar: '～からといって(高频考点)', meaning: '虽说…但不…', nuance: '100％ではない，正しい理由にならない/不是百分之百，不能成为正当理由，虽说…却不… 不要因为…而…', examples: ['金持ちだからといって、幸せとはかぎらない。/虽说有钱，但未必幸福。', '遊びたいからといって、学校を休むことはできない。/虽说想玩，但不能因此而不去上学。', '日本人だからといって、誰もが敬語を正しく使えるというわけではない。/虽说日本人，但并非人人都能正确使用敬语。'], parts: [['金持ち', 'だからといって', '幸せとは', 'かぎらない'], ['遊びたい', 'からといって', '学校を', '休むことは', 'できない'], ['日本人', 'だからといって', '誰もが', '敬語を', '正しく', '使えるというわけではない']] },
             { id: 2, grammar: '～からには、～からは', meaning: '既然…就…', nuance: '「あたりまえ」という気持ち/当然，既然…就', examples: ['約束したからには、守っていただきます。/既然约定了，就必须遵守。', 'こうなったからは、男として、何が何でも成功させてみせる。/既然事情变成这样，作为男人，无论如何也要让它成功。', '試合に出るからには、勝ちたい。/既然要参加比赛，就想赢。'], parts: [['約束した', 'からには', '守って', 'いただきます'], ['こうなった', 'からは', '男として', '何が何でも', '成功させてみせる'], ['試合に', '出る', 'からには', '勝ちたい']] },
             { id: 3, grammar: '～おかげで、～おかげだ', meaning: '多亏…(褒义)', nuance: '（良い結果）理由、原因、「ありがたい」という気持ち/（好的结果）由于…，多亏…，托…的福', examples: ['救援隊が早くきてくれたおかげで、助かった。/多亏救援队来得早，得救了。', '試験に合格できたのは、この本のおかげです。/能通过考试，多亏了这本书。', '先生が教えてくださったおかげで、合格することができました。/多亏了老师的教导，我才能通过考试。'], parts: [['救援隊が', '早くきてくれた', 'おかげで', '助かった'], ['試験に', '合格できたのは', 'この本の', 'おかげです'], ['先生が', '教えてくださった', 'おかげで', '合格することが', 'できました']] },
             { id: 4, grammar: '～せいだ、～せいで、～せいか', meaning: '因为…(贬义)', nuance: '（悪い結果）理由、原因、「～が悪い」と非難する気持ち/（不好的结果）由于…，都怪…，因为…', examples: ['バスが遅れたせいで、約束の時間に間に合わなかった。/因为公交车晚点了，所以没赶上约定的时间。', 'お酒を飲みすぎたせいで、頭が痛い。/因为酒喝太多了，头很痛。', '年のせいか、このごろ物忘れがひどい。/不知道是不是因为年纪大了，最近忘事很严重。'], parts: [['バスが', '遅れたせいで', '約束の時間に', '間に合わなかった'], ['お酒を', '飲みすぎたせいで', '頭が', '痛い'], ['年の', 'せいか', 'このごろ', '物忘れが', 'ひどい']] },
-            { id: 5, grammar: '～だけに、～だけあって', meaning: '正因为…', nuance: '「～から、やはり～」と、理由を強調する/正因为…才…', examples: ['値段が高いだけに、品物もいい。/正因为价格贵，所以东西也很好。', 'この大学は歴史が長いだけあって伝統がある。/这个大学正因为历史悠久，所以有传统。', '彼はスポーツマンだけあって、体格がいい。/正因为他是运动员，所以体格很好。'], parts: [['値段が', '高い', 'だけに', '品物も', 'いい'], ['この大学は', '歴史が', '長い', 'だけあって', '伝統が', 'ある'], ['彼は', 'スポーツマン', 'だけあって', '体格が', 'いい']] },
+            { id: 5, grammar: '～だけに、～だけあって（高频考点）', meaning: '正因为…', nuance: '「～から、やはり～」と、理由を強調する/正因为…才…', examples: ['値段が高いだけに、品物もいい。/正因为价格贵，所以东西也很好。', 'この大学は歴史が長いだけあって伝統がある。/这个大学正因为历史悠久，所以有传统。', '彼はスポーツマンだけあって、体格がいい。/正因为他是运动员，所以体格很好。'], parts: [['値段が', '高い', 'だけに', '品物も', 'いい'], ['この大学は', '歴史が', '長い', 'だけあって', '伝統が', 'ある'], ['彼は', 'スポーツマン', 'だけあって', '体格が', 'いい']] },
             { id: 6, grammar: '～ものだから', meaning: '因为…(多用于借口)', nuance: '言い訳で使われることが多い/常用于借口', examples: ['すみません、きのうはちょっと熱があったものだから、休ませていただきました。/不好意思，因为昨天有点发烧，所以请假了。', '「なぜ遅刻したのですか」「すみません、事故で電車が止まってしまったものですから」/“为什么迟到了？”“不好意思，因为出事故电车停了。”', 'あまり天気がいいものだから、どこかへ出かけたくなった。/因为天气太好了，所以很想去哪里玩。'], parts: [['すみません', 'きのうは', 'ちょっと', '熱が', 'あった', 'ものだから', '休ませて', 'いただきました'], ['なぜ', '遅刻したのですか', 'すみません', '事故で', '電車が', '止まってしまった', 'ものですから'], ['あまり', '天気が', 'いい', 'ものだから', 'どこかへ', '出かけたくなった']] },
             { id: 7, grammar: '～ばかりに', meaning: '只因…(导致不好结果)', nuance: '「～ために、悪い結果になった」と残念な気持ちを表す/只因为…，结果…（表示遗憾）', examples: ['ケチなばかりに、みんなに嫌われる。/只因为吝啬，所以被大家讨厌。', '本当のことを言ったばかりに、彼を怒らせてしまった。/只因为说了实话，所以惹他生气了。', '彼は英語の教師であるばかりに、通訳の仕事を頼まれる。/只因为他是英语老师，所以被拜托做翻译工作。'], parts: [['ケチな', 'ばかりに', 'みんなに', '嫌われる'], ['本当のことを', '言った', 'ばかりに', '彼を', '怒らせてしまった'], ['彼は', '英語の', '教師である', 'ばかりに', '通訳の仕事を', '頼まれる']] },
             { id: 8, grammar: '～以上（は）', meaning: '既然…就…', nuance: '「～のだから、当然～」という強い気持ち/既然…就…（表示理所当然的强烈心情）', examples: ['一度契約した以上、簡単には取り消すことはできない。/既然已经签了合同，就不能轻易取消。', '学生である以上は、勉強を第一に考えなければならない。/既然是学生，就必须把学习放在第一位。', '試験を受ける以上、何とかして合格したい。/既然要参加考试，无论如何都想通过。'], parts: [['一度', '契約した', '以上', '簡単には', '取り消すことは', 'できない'], ['学生である', '以上は', '勉強を', '第一に', '考えなければ', 'ならない'], ['試験を', '受ける', '以上', '何とかして', '合格したい']] },
@@ -183,21 +188,21 @@
             { id: 22, grammar: '～にほかならない', meaning: '无非是…正是…', nuance: '「～以外のものではない」と断定する/断定…以外的东西都不是，正是…', examples: ['この成功は、皆さんの協力があったからにほかならない。/这次成功，无非是因为大家的帮助。', '彼が合格したのは、努力の結果にほかならない。/他能通过考试，正是努力的结果。', '戦争は死にほかならない。/战争无非是死亡。'], parts: [['この成功は', '皆さんの', '協力が', 'あった', 'からに', 'ほかならない'], ['彼が', '合格したのは', '努力の', '結果に', 'ほかならない'], ['戦争は', '死に', 'ほかならない']] },
             { id: 23, grammar: '～にすぎない', meaning: '只不过是…', nuance: '「～以上のものではない、たいしたことない」/只不过是…，没什么了不起', examples: ['私はただの社員にすぎませんから、決定権はありません。/我只不过是普通职员，所以没有决定权。', '彼の言っていることは、言い訳にすぎない。/他说的，只不过是借口罢了。', '目標の半分を達成したにすぎない。/只不过完成了目标的一半而已。'], parts: [['私は', 'ただの', '社員に', 'すぎませんから', '決定権は', 'ありません'], ['彼の', '言っていることは', '言い訳に', 'すぎない'], ['目標の', '半分を', '達成した', 'にすぎない']] },
             { id: 24, grammar: '～に越したことはない', meaning: '没有比…更好的了', nuance: '「～のほうがいい」/…更好', examples: ['用心するに越したことはない。/小心为上。', '旅行の荷物は、軽いに越したことはない。/旅行的行李，越轻越好。', 'お金はあるに越したことはない。/钱，有总比没有好。'], parts: [['用心するに', '越したことは', 'ない'], ['旅行の', '荷物は', '軽いに', '越したことは', 'ない'], ['お金は', 'あるに', '越したことは', 'ない']] },
-            { id: 25, grammar: '～ざるを得ない', meaning: '不得不…', nuance: '「～したくないが、しなければならない」/不想做…，但不得不做', examples: ['上司の命令なので、やらざるを得ない。/因为是上司的命令，所以不得不做。', 'みんなが反対しているので、計画をあきらめざるを得ない。/因为大家都反对，所以不得不放弃计划。', '病気のため、旅行を中止せざるを得なかった。/因为生病，不得不中止旅行。'], parts: [['上司の', '命令なので', 'やらざるを', '得ない'], ['みんなが', '反対している', 'ので', '計画を', 'あきらめざるを', '得ない'], ['病気の', 'ため', '旅行を', '中止せざるを', '得なかった']] },
+            { id: 25, grammar: '～ざるを得ない(高频考点)', meaning: '不得不…', nuance: '「～したくないが、しなければならない」/不想做…，但不得不做', examples: ['上司の命令なので、やらざるを得ない。/因为是上司的命令，所以不得不做。', 'みんなが反対しているので、計画をあきらめざるを得ない。/因为大家都反对，所以不得不放弃计划。', '病気のため、旅行を中止せざるを得なかった。/因为生病，不得不中止旅行。'], parts: [['上司の', '命令なので', 'やらざるを', '得ない'], ['みんなが', '反対している', 'ので', '計画を', 'あきらめざるを', '得ない'], ['病気の', 'ため', '旅行を', '中止せざるを', '得なかった']] },
             { id: 26, grammar: '～てはならない', meaning: '不可以…', nuance: '「～てはいけない」という強い禁止。/不可以…（强烈的禁止）', examples: ['人のものを盗んではならない。/不可以偷别人的东西。', '未成年者は酒を飲んではならない。/未成年人不可以喝酒。', 'どんなことがあっても、人をだましてはならない。/无论发生什么，都不可以骗人。'], parts: [['人のものを', '盗んで', 'はならない'], ['未成年者は', '酒を', '飲んでは', 'ならない'], ['どんなことが', 'あっても', '人を', 'だまして', 'はならない']] },
             { id: 27, grammar: '～てばかりはいられない', meaning: '不能光…', nuance: '「ずっと～しているわけにはいかない」/不能一直…', examples: ['もうすぐ試験だから、遊んでばかりはいられない。/马上就要考试了，不能光玩。', '親に頼ってばかりはいられない。/不能一直依赖父母。', '失敗して、いつまでも泣いてばかりはいられない。/失败了，不能一直哭。'], parts: [['もうすぐ', '試験だから', '遊んで', 'ばかりは', 'いられない'], ['親に', '頼って', 'ばかりは', 'いられない'], ['失敗して', 'いつまでも', '泣いて', 'ばかりは', 'いられない']] },
-            { id: 28, grammar: '～ないではいられない', meaning: '忍不住…', nuance: '「どうしても～してしまう」/无论如何都会…', examples: ['彼の話は面白いので、笑わないではいられない。/他说话很有趣，所以忍不住笑。', 'あの感動的な映画を見て、泣かないではいられなかった。/看了那部感人的电影，忍不住哭了。', 'この曲を聞くと、歌わないではいられない。/听到那首歌，忍不住想唱。'], parts: [['彼の', '話は', '面白いので', '笑わない', 'では', 'いられない'], ['あの', '感動的な', '映画を', '見て', '泣かない', 'では', 'いられなかった'], ['この曲を', '聞くと', '歌わない', 'では', 'いられない']] },
-            { id: 29, grammar: '～わけにはいかない', meaning: '不能…', nuance: '「事情があって、～できない」/因为有原因，所以不能…', examples: ['明日は大事な会議があるから、休むわけにはいかない。/明天有重要的会议，所以不能休息。', '友達との約束だから、行かないわけにはいかない。/因为和朋友有约定，所以不能不去。', '税金は、払わないわけにはいかない。/税金不能不交。'], parts: [['明日は', '大事な', '会議が', 'あるから', '休む', 'わけには', 'いかない'], ['友達との', '約束だから', '行かない', 'わけには', 'いかない'], ['税金は', '払わない', 'わけには', 'いかない']] },
-            { id: 30, grammar: '～わけではない', meaning: '并非…', nuance: '「100％～だ、とは言えない」という部分否定/并非100%是…，部分否定', examples: ['高い料理がすべておいしいわけではない。/贵的料理并非全部都好吃。', 'お金があれば幸せになれるというわけではない。/并非有钱就能幸福。', '日本人がみんな、納豆が好きというわけではない。/并非所有日本人都喜欢纳豆。'], parts: [['高い', '料理が', 'すべて', 'おいしい', 'わけではない'], ['お金が', 'あれば', '幸せに', 'なれると', 'いう', 'わけではない'], ['日本人が', 'みんな', '納豆が', '好き', 'という', 'わけでは', 'ない']] },
+            { id: 28, grammar: '～ないではいられない(高频考点)', meaning: '忍不住…', nuance: '「どうしても～してしまう」/无论如何都会…', examples: ['彼の話は面白いので、笑わないではいられない。/他说话很有趣，所以忍不住笑。', 'あの感動的な映画を見て、泣かないではいられなかった。/看了那部感人的电影，忍不住哭了。', 'この曲を聞くと、歌わないではいられない。/听到那首歌，忍不住想唱。'], parts: [['彼の', '話は', '面白いので', '笑わない', 'では', 'いられない'], ['あの', '感動的な', '映画を', '見て', '泣かない', 'では', 'いられなかった'], ['この曲を', '聞くと', '歌わない', 'では', 'いられない']] },
+            { id: 29, grammar: '～わけにはいかない(高频考点)', meaning: '不能…', nuance: '「事情があって、～できない」/因为有原因，所以不能…', examples: ['明日は大事な会議があるから、休むわけにはいかない。/明天有重要的会议，所以不能休息。', '友達との約束だから、行かないわけにはいかない。/因为和朋友有约定，所以不能不去。', '税金は、払わないわけにはいかない。/税金不能不交。'], parts: [['明日は', '大事な', '会議が', 'あるから', '休む', 'わけには', 'いかない'], ['友達との', '約束だから', '行かない', 'わけには', 'いかない'], ['税金は', '払わない', 'わけには', 'いかない']] },
+            { id: 30, grammar: '～わけではない(高频考点)', meaning: '并非…', nuance: '「100％～だ、とは言えない」という部分否定/并非100%是…，部分否定', examples: ['高い料理がすべておいしいわけではない。/贵的料理并非全部都好吃。', 'お金があれば幸せになれるというわけではない。/并非有钱就能幸福。', '日本人がみんな、納豆が好きというわけではない。/并非所有日本人都喜欢纳豆。'], parts: [['高い', '料理が', 'すべて', 'おいしい', 'わけではない'], ['お金が', 'あれば', '幸せに', 'なれると', 'いう', 'わけではない'], ['日本人が', 'みんな', '納豆が', '好き', 'という', 'わけでは', 'ない']] },
             { id: 31, grammar: '～ことはない', meaning: '不必…', nuance: '「～する必要はない」/没有…的必要', examples: ['そんなに急ぐことはない。/没必要那么急。', 'わざわざお土産を持ってくることはないよ。/没必要特意带礼物来。', 'がっかりすることはない。次のチャンスがあるから。/没必要那么失望，还有下一次机会。'], parts: [['そんなに', '急ぐ', 'ことはない'], ['わざわざ', 'お土産を', '持って', 'くる', 'ことはないよ'], ['がっかりする', 'ことはない', '次の', 'チャンスが', 'あるから']] },
             { id: 32, grammar: '～ないわけにはいかない', meaning: '不能不…', nuance: '「どうしても～しなければならない」/无论如何都不得不…', examples: ['部長に頼まれたから、行かないわけにはいかない。/因为是部长拜托的，所以不能不去。', '親友の結婚式だから、出席しないわけにはいかない。/因为是好朋友的婚礼，所以不能不出席。', '会社の飲み会はあまり好きじゃないけど、行かないわけにはいかない。/虽然不太喜欢公司的酒会，但不能不去。'], parts: [['部長に', '頼まれたから', '行かない', 'わけには', 'いかない'], ['親友の', '結婚式だから', '出席しない', 'わけには', 'いかない'], ['会社の', '飲み会は', 'あまり', '好きじゃないけど', '行かない', 'わけには', 'いかない']] },
             { id: 33, grammar: '～まい、～まいか', meaning: '不会…吧', nuance: '打ち消しの推量、否定の意志/否定性推测，否定性意志', examples: ['あいつは二度と来るまい。/那家伙不会再来了吧。', 'そんなことはあるまい。/那种事不会有的吧。', '二度と負けまいと心に誓った。/我下定决心再也不会输。'], parts: [['あいつは', '二度と', '来るまい'], ['そんなことは', 'あるまい'], ['二度と', '負けまいと', '心に', '誓った']] },
             { id: 34, grammar: '～に決まっている', meaning: '肯定…', nuance: '話し手の強い確信/说话人强烈的确信', examples: ['そんな嘘、誰だって見抜く（みぬく）に決まっている。/那种谎话，谁都能看穿。', 'あんなに練習したんだから、優勝するに決まっている。/练了那么久，肯定会赢的。', '彼女のことだから、遅刻するに決まっている。/因为是她，肯定会迟到。'], parts: [['そんな嘘', '誰だって', '見抜く', 'に決まっている'], ['あんなに', '練習したんだから', '優勝する', 'に決まっている'], ['彼女の', 'ことだから', '遅刻する', 'に決まっている']] },
-            { id: 35, grammar: '～に違いない', meaning: '肯定…', nuance: '「絶対に～だ」という強い推量/“绝对是…”的强烈推测', examples: ['窓が割れている。泥棒が入ったに違いない。/窗户坏了。肯定有小偷进来了。', '彼は日本語が上手なので、日本に住んだことがあるに違いない。/他日语那么好，肯定在日本住过。', 'この事件の犯人は彼に違いない。/这起事件的犯人肯定是他。'], parts: [['窓が', '割れている', '泥棒が', '入った', 'に違いない'], ['彼は', '日本語が', '上手なので', '日本に', '住んだことが', 'ある', 'に違いない'], ['この事件の', '犯人は', '彼に', '違いない']] },
+            { id: 35, grammar: '～に違いない(阅读里经常出现)', meaning: '肯定…', nuance: '「絶対に～だ」という強い推量/“绝对是…”的强烈推测', examples: ['窓が割れている。泥棒が入ったに違いない。/窗户坏了。肯定有小偷进来了。', '彼は日本語が上手なので、日本に住んだことがあるに違いない。/他日语那么好，肯定在日本住过。', 'この事件の犯人は彼に違いない。/这起事件的犯人肯定是他。'], parts: [['窓が', '割れている', '泥棒が', '入った', 'に違いない'], ['彼は', '日本語が', '上手なので', '日本に', '住んだことが', 'ある', 'に違いない'], ['この事件の', '犯人は', '彼に', '違いない']] },
             { id: 36, grammar: '～とは限らない', meaning: '不一定…', nuance: '「～とは言い切れない」/不一定…', examples: ['人間だれしも失敗しないとは限らない。/人并非不失败。', 'お金持ちが幸せだとは限らない。/有钱人未必幸福。', '強いチームが勝つとは限らない。/强的队伍不一定赢。'], parts: [['人間', 'だれしも', '失敗しない', 'とは', '限らない'], ['お金持ちが', '幸せだ', 'とは', '限らない'], ['強い', 'チームが', '勝つ', 'とは', '限らない']] },
             { id: 37, grammar: '～はずがない', meaning: '不可能…', nuance: '「～であるはずがない」/不可能…', examples: ['あのまじめな彼が、そんなことをするはずがない。/那个认真的他，不可能做那种事。', 'こんなに一生懸命練習したんだから、失敗するはずがない。/这么努力练习了，不可能失败。', '彼が知らないはずがない。/他不可能不知道。'], parts: [['あのまじめな', '彼が', 'そんなことを', 'する', 'はずがない'], ['こんなに', '一生懸命', '練習したんだから', '失敗する', 'はずがない'], ['彼が', '知らない', 'はずがない']] },
             { id: 38, grammar: '～ことになっている', meaning: '规定…', nuance: '「～という規則、習慣、予定がある」/有…的规定、习惯、预定', examples: ['この寮では、夜10時以降はシャワーを使ってはいけないことになっている。/这间宿舍规定，晚上10点以后不能洗澡。', '法律では、20歳未満の飲酒は禁止されていることになっている。/法律规定，20岁以下的人禁止喝酒。', '明日から出張することになっています。/我明天要去出差。'], parts: [['この寮では', '夜10時', '以降は', 'シャワーを', '使っては', 'いけない', 'ことになっている'], ['法律では', '20歳', '未満の', '飲酒は', '禁止されて', 'いる', 'ことになっている'], ['明日から', '出張する', 'ことになって', 'います']] },
-            { id: 39, grammar: '～ようになっている', meaning: '设计成…', nuance: '「機械などが～という機能を持っている」/机器等有…的功能', examples: ['この自動ドアは、人が近づくと開くようになっている。/这个自动门，有人靠近就会打开。', 'このパソコンは、一定時間使わないと電源が切れるようになっている。/这台电脑，一段时间不用就会自动关机。', 'この部屋の電気は、人が来るとつくようになっている。/这个房间的电灯，有人来就会亮。'], parts: [['この自動ドアは', '人が', '近づくと', '開くように', 'なっている'], ['このパソコンは', '一定時間', '使わないと', '電源が', '切れるように', 'なっている'], ['この部屋の', '電気は', '人が', '来ると', 'つくように', 'なっている']] },
+            { id: 39, grammar: '～ようになっている', meaning: '设计成…', nuance: '「機械などが～という機能を持っている」/机器等有…的功能', examples: ['この自動ドアは、人が近づくと開くようになっている。/这个自动门，有人靠近就会打开。', 'このパソコンは、一定時間使わないと電源が切れるようになっている。/这台电脑，一段时间不用就会自动关机。', 'この部屋の電気は、人が来るとつくようになっている。/这个房间的电灯，有人来就会亮。'], parts: [['この自動ドアは', '人が', '近づくと', '開くように', 'なっている'], ['このパソコンは', '一定時間', '使わないと', '電源が', '切れるようになっている'], ['この部屋の', '電気は', '人が', '来ると', 'つくように', 'なっている']] },
             { id: 40, grammar: '～ことだ', meaning: '…是应该做的', nuance: '「～したほうがいい」という忠告やアドバイス/劝告或建议…', examples: ['健康のためには、毎日運動することだ。/为了健康，每天都要运动。', '日本語を勉強するなら、毎日日本のドラマを見ることだ。/如果想学日语，就每天看日剧。', '分からないことがあったら、すぐに先生に聞くことだ。/如果有不懂的地方，就立刻问老师。'], parts: [['健康の', 'ためには', '毎日', '運動する', 'ことだ'], ['日本語を', '勉強するなら', '毎日', '日本の', 'ドラマを', '見る', 'ことだ'], ['分からない', 'ことが', 'あったら', 'すぐに', '先生に', '聞く', 'ことだ']] },
             { id: 41, grammar: '～ようだ、～みたいだ', meaning: '好像…', nuance: '「～のように見える」という推量/看起来…的推测', examples: ['彼は今日、風邪をひいたようだ。/他今天好像感冒了。', '隣の家は留守みたいだ。/隔壁家好像没人。', 'さっきから空が暗い。雨が降るようだ。/刚才开始天就很黑，好像要下雨了。'], parts: [['彼は', '今日', '風邪を', 'ひいた', 'ようだ'], ['隣の', '家は', '留守', 'みたいだ'], ['さっきから', '空が', '暗い', '雨が', '降る', 'ようだ']] },
             { id: 42, grammar: '～らしい', meaning: '好像…', nuance: '「～のように聞こえる、らしい」/听起来…', examples: ['彼女の話によると、彼は海外へ引っ越したらしい。/听她的话，他好像搬到国外去了。', '田中さんは来月結婚するらしい。/田中先生好像下个月要结婚。', 'あの二人は恋人らしい。/那两个人好像是恋人。'], parts: [['彼女の', '話に', 'よると', '彼は', '海外へ', '引っ越した', 'らしい'], ['田中さんは', '来月', '結婚する', 'らしい'], ['あの二人は', '恋人', 'らしい']] },
@@ -267,9 +272,94 @@
             { id: 106, grammar: '～がたい', meaning: '难以…', nuance: '「～するのが難しい、できない」/难以…，无法…', examples: ['信じがたい話だが、本当だ。/难以置信的话，但却是真的。', '彼のような人に、謝りがたい。/向他那样的人，很难道歉。', 'この曲は、忘れがたい。/这首歌，难以忘怀。'], parts: [['信じ', 'がたい', '話だが', '本当だ'], ['彼の', 'ような人に', '謝り', 'がたい'], ['この曲は', '忘れ', 'がたい']] },
             { id: 107, grammar: '～かねる', meaning: '难以…，不能…', nuance: '「～することができない」/难以…，不能…', examples: ['申し訳ありませんが、そのご要望にはお応えしかねます。/非常抱歉，您的要求我无法满足。', 'その件については、私一人では判断しかねます。/关于那件事，我一个人难以判断。', '信じがたい事実だが、受け入れざるを得ない。/虽然是难以置信的事实，但不得不接受。'], parts: [['申し訳', 'ありませんが', 'その', 'ご要望には', 'お応えし', 'かねます'], ['その件に', 'ついては', '私', '一人では', '判断し', 'かねます'], ['信じ', 'がたい', '事実だが', '受け入れ', 'ざるを', '得ない']] },
             { id: 108, grammar: '～ようがない', meaning: '无法…', nuance: '「～する方法がない、～できない」/没有…的方法，无法…', examples: ['この問題は、どうしようもない。/这个问题，没有办法解决。', '彼の悲しみを、慰めようがない。/他的悲伤，无法安慰。', 'この状況では、何も言おうがない。/在这种情况下，没有什么可说的。'], parts: [['この問題は', 'どう', 'しようが', 'ない'], ['彼の', '悲しみを', '慰め', 'ようが', 'ない'], ['この状況では', '何も', '言おうが', 'ない']] },
-            { id: 109, grammar: '～かねない', meaning: '很可能…(负面)', nuance: '「～する可能性がある」/有…的可能性（负面）', examples: ['こんなに遅いと、終電に乗り遅れかねない。/这么晚，很可能会赶不上末班车。', '彼の性格からすると、文句を言いかねない。/从他的性格来看，很可能会抱怨。', 'このままでは、事故を起こしかねない。/这样下去，很可能会发生事故。'], parts: [['こんなに', '遅いと', '終電に', '乗り遅れ', 'かねない'], ['彼の', '性格から', 'すると', '文句を', '言い', 'かねない'], ['このままでは', '事故を', '起こし', 'かねない']] }
+            { id: 109, grammar: '～かねない（高频考点）', meaning: '很可能…(负面)', nuance: '「～する可能性がある」/有…的可能性（负面）', examples: ['こんなに遅いと、終電に乗り遅れかねない。/这么晚，很可能会赶不上末班车。', '彼の性格からすると、文句を言いかねない。/从他的性格来看，很可能会抱怨。', 'このままでは、事故を起こしかねない。/这样下去，很可能会发生事故。'], parts: [['こんなに', '遅いと', '終電に', '乗り遅れ', 'かねない'], ['彼の', '性格から', 'すると', '文句を', '言い', 'かねない'], ['このままでは', '事故を', '起こし', 'かねない']] }
         ];
+
+        const grammarDataN5N4 = [
+            { id: 1, grammar: '～後に／後で', meaning: '在...之后', examples: ['ごはんを 食べた後で 、歯を磨きます。/在吃完饭之后刷牙。', '仕事の 後で 、友達に会います。/在工作之后见朋友。'], parts: [['ごはんを', '食べた', '後で', '歯を', '磨きます'], ['仕事の', '後で', '友達に', '会います']] },
+            { id: 2, grammar: '～てから', meaning: '...了之后', examples: ['顔を 洗ってから 、朝ご飯を食べます。/洗完脸之后才早饭。'], parts: [['顔を', '洗ってから', '朝ご飯を', '食べます']] },
+            { id: 3, grammar: '～ていく', meaning: '持续做...（从现在开始）时间和空间上的由近及远', examples: ['これからもっと日本語を 勉強していきます 。/今后将持续学习日语。'], parts: [['これから', 'もっと', '日本語を', '勉強して', 'いきます']] },
+            { id: 4, grammar: '～てくる', meaning: '开始...起来', examples: ['突然、雨が 降ってきました 。/突然下起雨来了。'], parts: [['突然', '雨が', '降って', 'きました']] },
+            { id: 5, grammar: '～ている', meaning: '正在...；持续...；状态', examples: ['今、ご飯を 食べています 。/现在正在吃饭。', '彼について 知っている 人はいますか。/有没有人了解他？'], parts: [['今', 'ご飯を', '食べて', 'います'], ['彼について', '知って', 'いる', '人は', 'いますか']] },
+            { id: 6, grammar: '～てある', meaning: '已经...好了；比起单纯描述状态，更加强调是一种有目的性的动作喔；', examples: ['窓が 開けてあります 。/窗户是开着的。'], parts: [['窓が', '開けて', 'あります']] },
+            { id: 7, grammar: '～が欲しい', meaning: '第一人称，想要...（东西）；如果是第三人称，要用～欲しがる', examples: ['わたしは新しいカメラ が欲しい です。/我想要一台新相机。'], parts: [['わたしは', '新しいカメラが', '欲しいです']] },
+            { id: 8, grammar: '～たい', meaning: '想做...（事情）', examples: ['わたしはラーメンが 食べたい です。/我想吃拉面。'], parts: [['わたしは', 'ラーメンが', '食べたいです']] },
+            { id: 9, grammar: '～らしい', meaning: '好像...；听起来...', examples: ['彼はもう国へ帰った らしい です。/他好像已经回国了。'], parts: [['彼は', 'もう', '国へ', '帰った', 'らしいです']] },
+            { id: 10, grammar: '～ようだ', meaning: '好像...；像...', examples: ['彼女は人形 のように 可愛いです。/她像玩偶一样可爱。'], parts: [['彼女は', '人形の', 'ように', '可愛いです']] },
+            { id: 11, grammar: '～そうだ（样态）', meaning: '看起来...', examples: ['このケーキは おいしそうです 。/这个蛋糕看起来很好吃。'], parts: [['このケーキは', 'おいし', 'そうです']] },
+            { id: 12, grammar: '～そうだ（传闻）', meaning: '听说...', examples: ['明日は雨が 降るそうです 。/听说明天会下雨。'], parts: [['明日は', '雨が', '降る', 'そうです']] },
+            { id: 13, grammar: '～かもしれない', meaning: '可能...；也许...', examples: ['彼はもう家に 帰ったかもしれません 。/他可能已经回家了。'], parts: [['彼は', 'もう', '家に', '帰った', 'かもしれません']] },
+            { id: 14, grammar: '～はずだ／はずがない', meaning: '应该...；不可能...；在主观上十分有依据地推测', examples: ['彼は日本語を勉強したので、 分かるはずだ 。/他学了日语，应该能懂。'], parts: [['彼は', '日本語を', '勉強したので', '分かる', 'はずだ']] },
+            { id: 15, grammar: '～方（かた）', meaning: '...的方法', examples: ['このパソコンの 使い方が 分かりません。/我不知道这台电脑的使用方法。'], parts: [['このパソコンの', '使い方が', '分かりません']] },
+            { id: 16, grammar: '～ことができる', meaning: '能够...', examples: ['私は日本語を 話すことができます 。/我能够说日语。'], parts: [['私は', '日本語を', '話すことが', 'できます']] },
+            { id: 17, grammar: '～やすい（易い）', meaning: '容易...', examples: ['この本はとても 読みやすい です。/这本书很容易读。'], parts: [['この本は', 'とても', '読みやすいです']] },
+            { id: 18, grammar: '～にくい（難い）', meaning: '难做...', examples: ['このペンはとても 書きにくい です。/这支笔很难写。'], parts: [['このペンは', 'とても', '書きにくいです']] },
+            { id: 19, grammar: '～になる', meaning: '自然地变成...', examples: ['大人 になりました 。/变成大人了。'], parts: [['大人に', 'なりました']] },
+            { id: 20, grammar: '～にする', meaning: '把...变成...', examples: ['部屋を きれいにします 。/把房间弄干净。'], parts: [['部屋を', 'きれいに', 'します']] },
+            { id: 21, grammar: '～ようにする', meaning: '努力做到...', examples: ['毎日運動する ようにします 。/我努力每天运动。'], parts: [['毎日', '運動する', 'ように', 'します']] },
+            { id: 22, grammar: '～ようになる', meaning: '变得能够...', examples: ['毎日練習したので、自転車に 乗れるようになりました 。/因为每天练习，所以会骑自行车了。'], parts: [['毎日', '練習したので', '自転車に', '乗れるように', 'なりました']] },
+            { id: 23, grammar: '～ているところだ', meaning: '正在进行...', examples: ['今、料理を 作っているところです 。/我现在正在做料理。'], parts: [['今', '料理を', '作っている', 'ところです']] },
+            { id: 24, grammar: '～まま', meaning: '保持原样', examples: ['電気を つけたまま 寝てしまった。/开着灯就睡着了。'], parts: [['電気を', 'つけたまま', '寝て', 'しまった']] },
+            { id: 25, grammar: '～せる／させる', meaning: '让...做...', examples: ['先生は生徒を 立たせました 。/老师让学生站着。'], parts: [['先生は', '生徒を', '立たせ', 'ました']] },
+            { id: 26, grammar: '～（さ）せられる', meaning: '被迫做...', examples: ['私は先生に宿題を させられました 。/我被迫写了老师布置的作业。'], parts: [['私は', '先生に', '宿題を', 'させられ', 'ました']] },
+            { id: 27, grammar: '～れる／られる（受身）', meaning: '被...', examples: ['彼は先生に 褒められました 。/他被老师表扬了。'], parts: [['彼は', '先生に', '褒められ', 'ました']] },
+            { id: 28, grammar: '～れる／られる（可能）', meaning: '能够...', examples: ['私は日本語を 話せます 。/我能够说日语。'], parts: [['私は', '日本語を', '話せ', 'ます']] },
+            { id: 29, grammar: '～から', meaning: '因为...', examples: ['疲れた から 、早く寝ます。/因为累了，早点睡。'], parts: [['疲れた', 'から', '早く', '寝ます']] },
+            { id: 30, grammar: '～ので', meaning: '因为...ので比から在语义上更加客观', examples: ['雨が 降ったので 、出かけませんでした。/因为下雨了，所以没出门。'], parts: [['雨が', '降ったので', '出かけ', 'ませんでした']] },
+            { id: 31, grammar: '～てください', meaning: '请...', examples: ['ドアを 開けてください 。/请打开门。'], parts: [['ドアを', '開けて', 'ください']] },
+            { id: 32, grammar: '～なさい', meaning: '...吧（命令）', examples: ['早くご飯を 食べなさい 。/快点吃饭吧。'], parts: [['早く', 'ご飯を', '食べなさい']] },
+            { id: 33, grammar: '～ましょう', meaning: '...吧（建议）', examples: ['一緒に帰り ましょう 。/一起回家吧。'], parts: [['一緒に', '帰りましょう']] },
+            { id: 34, grammar: '～ませんか', meaning: '...吗？（邀请）', examples: ['お茶を 飲みませんか 。/要不要喝杯茶？'], parts: [['お茶を', '飲みませんか']] },
+            { id: 35, grammar: '～をください', meaning: '请给我...', examples: ['このパン を下さい 。/请给我这个面包。'], parts: [['このパンを', '下さい']] },
+            { id: 36, grammar: '～くらい／ぐらい', meaning: '大约...', examples: ['毎日2時間 ぐらい 日本語を勉強します。/每天学习日语大概2小时。'], parts: [['毎日', '2時間', 'ぐらい', '日本語を', '勉強します']] },
+            { id: 37, grammar: '～ほど', meaning: '...的程度', examples: ['疲れて死ぬ ほど です。/累得快要死了。'], parts: [['疲れて', '死ぬ', 'ほどです']] },
+            { id: 38, grammar: '～ほど～ない', meaning: '不像...那么...', examples: ['彼は私 ほど 背が高く ない 。/他没有我那么高。'], parts: [['彼は', '私ほど', '背が', '高くない']] },
+            { id: 39, grammar: '～まで／までに', meaning: '直到...；在...之前', examples: ['9時 までに 学校に来てください。/请在9点之前来学校。'], parts: [['9時までに', '学校に', '来て', 'ください']] },
+            { id: 40, grammar: '～がする', meaning: '感觉到...', examples: ['変な 音がします 。/有奇怪的声音。'], parts: [['変な', '音が', 'します']] },
+            { id: 41, grammar: '～始める', meaning: '开始做...', examples: ['雨が 降り始めた 。/开始下雨了。'], parts: [['雨が', '降り', '始めた']] },
+            { id: 42, grammar: '～出す', meaning: '突然开始...', examples: ['突然、彼が 笑い出した 。/他突然笑了起来。'], parts: [['突然', '彼が', '笑い出した']] },
+            { id: 43, grammar: '～続ける', meaning: '持续做...', examples: ['彼は勉強を 続けました 。/他持续学习。'], parts: [['彼は', '勉強を', '続け', 'ました']] },
+            { id: 44, grammar: '～過ぎる', meaning: '做得太...', examples: ['食べ 過ぎて お腹が痛い。/吃太多了肚子疼。'], parts: [['食べ', '過ぎて', 'お腹が', '痛い']] },
+            { id: 45, grammar: '～てみる', meaning: '试着做...', examples: ['この服を 着てみても いいですか。/我可以试试穿这件衣服吗？'], parts: [['この服を', '着て', 'みても', 'いいですか']] },
+            { id: 46, grammar: '～てしまう', meaning: '动作完成，遗憾；口语形式是～ちゃう/じゃう，口语中十分常用，前面也是动词て形，一定要记住喔！', examples: ['宿題を全部 やってしまいました 。/我把作业全部做完了。'], parts: [['宿題を', '全部', 'やって', 'しまいました']] },
+            { id: 47, grammar: '～てばかり', meaning: '总是做某个动作；光是，净是', examples: ['彼は毎日遊ん でばかりいます 。/他每天净是玩。'], parts: [['彼は', '毎日', '遊んで', 'ばかりいます']] },
+            { id: 48, grammar: '～たり～たりする', meaning: '又...又...；表示动作地列举，反复', examples: ['休みの日は、映画を 見たり 、本を 読んだり します。/休息日，我看看电影，读读书。'], parts: [['休みの日は', '映画を', '見たり', '本を', '読んだり', 'します']] },
+            { id: 49, grammar: '～てあげる', meaning: '为别人做...；', examples: ['私は母に料理を 作ってあげました 。/我为妈妈做了料理。'], parts: [['私は', '母に', '料理を', '作って', 'あげました']] },
+            { id: 50, grammar: '～てくれる', meaning: '别人为我做...；主语是别人！', examples: ['友達が私に本を 読んでくれました 。/朋友为我读了书。'], parts: [['友達が', '私に', '本を', '読んで', 'くれました']] },
+            { id: 51, grammar: '～てもらう', meaning: '请别人为我做...主语是自己！（己方）', examples: ['先生に日本語を 教えてもらいました 。/我请老师教了日语。'], parts: [['先生に', '日本語を', '教えて', 'もらいました']] },
+            { id: 52, grammar: '～つもりだ', meaning: '打算...', examples: ['明日、映画を見に 行くつもりです 。/我打算明天去看电影。'], parts: [['明日', '映画を', '見に', '行く', 'つもりです']] },
+            { id: 53, grammar: '～はずだ', meaning: '应该...；主观上十分有依据的推测', examples: ['彼は日本語を勉強したので、 分かるはずだ 。/他学了日语，应该能懂。'], parts: [['彼は', '日本語を', '勉強したので', '分かる', 'はずだ']] },
+            { id: 54, grammar: '～される（受身）', meaning: '被...', examples: ['彼は先生に 褒められました 。/他被老师表扬了。'], parts: [['彼は', '先生に', '褒められ', 'ました']] },
+            { id: 55, grammar: '～れる（可能）', meaning: '能够...', examples: ['私は日本語を 話せます 。/我能够说日语。'], parts: [['私は', '日本語を', '話せ', 'ます']] },
+            { id: 56, grammar: '～だけ', meaning: '只有...', examples: ['日本語が少し だけ 分かります。/我只懂一点点日语。'], parts: [['日本語が', '少しだけ', '分かります']] },
+            { id: 57, grammar: '～と', meaning: '①和...；②一...就...》》条件假定！前面用动词原形！春になると、花が咲きます（一到春天花就会开）', examples: ['友達 と 映画を見に行きます。/和朋友一起去看电影。'], parts: [['友達と', '映画を', '見に', '行きます']] },
+            { id: 58, grammar: '～ないで', meaning: '不...就...', examples: ['ごはんを 食べないで 寝ました。/没吃饭就睡了。'], parts: [['ごはんを', '食べないで', '寝ました']] },
+            { id: 59, grammar: '～ながら', meaning: '一边...一边...;用动词ます的连用形', examples: ['音楽を 聞きながら 、勉強します。/我一边听音乐，一边学习。'], parts: [['音楽を', '聞きながら', '勉強します']] },
+            { id: 60, grammar: '～について', meaning: '关于...', examples: ['日本の文化 について 、勉強します。/学习关于日本文化。'], parts: [['日本の', '文化について', '勉強します']] },
+            { id: 61, grammar: '～にとって', meaning: '对...来说', examples: ['私 にとって 、家族が一番大切です。/对我来说，家人最重要。'], parts: [['私にとって', '家族が', '一番', '大切です']] },
+            { id: 62, grammar: '～に対して', meaning: '对...；针对...', examples: ['お客様 に対して 、丁寧に対応します。/对客人，要礼貌地对待。'], parts: [['お客様に', '対して', '丁寧に対応', 'します']] },
+            { id: 63, grammar: '～は～が', meaning: '大主题小主语；は前面的是主题，が前面是主语，在大的主题下对主语进行描述', examples: ['この本 は 値段 が 高いです。/这本书价格很贵。'], parts: [['この本は', '値段が', '高いです']] },
+            { id: 64, grammar: '～くらい／ぐらい', meaning: '大约...；左右', examples: ['毎日2時間 くらい 日本語を勉強します。/我每天学习日语大概2小时。'], parts: [['毎日', '2時間くらい', '日本語を', '勉強します']] },
+            { id: 65, grammar: '～ほど', meaning: '...的程度', examples: ['疲れて死ぬ ほど です。/累得快要死了。'], parts: [['疲れて', '死ぬほど', 'です']] },
+            { id: 66, grammar: '～ほど～ない', meaning: '不像...那么...（没有那种程度。ほど作为【程度】的这个最基础的意思一定不能忘记）', examples: ['彼は私 ほど 背が高く ない 。/他没有我那么高。'], parts: [['彼は', '私ほど', '背が', '高くない']] },
+            { id: 67, grammar: '～までに', meaning: '在...之前；到...为止', examples: ['9時 までに 学校に来てください。/请在9点之前来学校。'], parts: [['9時までに', '学校に', '来て', 'ください']] },
+            { id: 68, grammar: '～ばいい', meaning: '...的话就好了；ば形是条件假定，记住这个意思文法就能自然理解！！', examples: ['もっと早く 起きればよかった 。/要是早点起床就好了。'], parts: [['もっと早く', '起きれば', 'よかった']] },
+            { id: 69, grammar: '～ても', meaning: '即使...也...；ても在绝大多数情况下都具备转折的意思！', examples: ['雨が 降っても 行きます。/即使下雨也要去。'], parts: [['雨が', '降っても', '行きます']] },
+            { id: 70, grammar: '～なければならない', meaning: '必须...；ば形是假定！！ない的假定なければ、加上なる的否定形式ならない、双重否定表示肯定！！！这种双重否定的文法有很多，虽然很长但是意思都是一样的！！', examples: ['明日、学校へ 行かなければなりません 。/明天必须去学校。'], parts: [['明日', '学校へ', '行かなければ', 'なりません']] },
+            { id: 71, grammar: '～なくてはいけない', meaning: '不...不行；双重否定表示肯定！也可以翻译成：一定要；必须', examples: ['宿題を しなくてはいけません 。/必须做作业。'], parts: [['宿題を', 'しなくては', 'いけません']] },
+            
+            { id: 72, grammar: '～うちに', meaning: '在...期间；趁着', examples: ['暗くならない うちに 帰りましょう。/趁着天还没黑回家吧。'], parts: [['暗くならない', 'うちに', '帰りましょう']] },
+            { id: 73, grammar: '～ところ', meaning: '正在...；前面是ている形式，表示正在；前面是动词原形，表示刚准备做（还没做），前面是动词た形，则表示刚做完。', examples: ['今、ご飯を 食べているところです 。/现在正在吃饭。'], parts: [['今', 'ご飯を', '食べている', 'ところです']] },
+            { id: 74, grammar: '～ばかり', meaning: '净是...；光是...；名词＋ばかり', examples: ['彼は毎日ゲーム ばかり しています。/他每天净是玩游戏。'], parts: [['彼は', '毎日', 'ゲームばかり', 'しています']] },
+            { id: 75, grammar: '〜ば', meaning: '如果...', examples: ['お金が あれば 、車を買います。/如果有钱，就买车。'], parts: [['お金が', 'あれば', '車を', '買います']] },
+          
         
+            { id: 76, grammar: '〜たらいい', meaning: '...的话就好了；跟～ばいい意思一样，都是假定形式加上いい', examples: ['もう少し 安かったらいいのに 。/要是再便宜一点就好了。'], parts: [['もう少し', '安かったら', 'いいのに']] }
+        ];
+
+        let selectedLevel = 'N5/N4';
+        let currentGrammarData = grammarDataN5N4;
+
         document.addEventListener('DOMContentLoaded', () => {
             const navLibrary = document.getElementById('nav-library');
             const navQuiz = document.getElementById('nav-quiz');
@@ -277,6 +367,7 @@
             const quizSection = document.getElementById('quiz-section');
             const searchInput = document.getElementById('search-input');
             const grammarGrid = document.getElementById('grammar-grid');
+            const levelBtns = document.querySelectorAll('.level-btn');
         
             const quizStartScreen = document.getElementById('quiz-start-screen');
             const quizQuestionScreen = document.getElementById('quiz-question-screen');
@@ -320,13 +411,32 @@
                     navQuiz.classList.remove('text-[#a5b2ac]', 'hover:text-[#6a7c73]', 'hover:bg-[#c3d1c4]');
                 }
             }
+
+            function selectLevel(level) {
+                selectedLevel = level;
+                levelBtns.forEach(btn => {
+                    btn.classList.remove('bg-[#c3d1c4]', 'text-[#6a7c73]', 'shadow-md');
+                    btn.classList.add('bg-white', 'text-[#a5b2ac]', 'hover:bg-[#c3d1c4]', 'hover:text-[#6a7c73]');
+                    if (btn.dataset.level === level) {
+                        btn.classList.add('bg-[#c3d1c4]', 'text-[#6a7c73]', 'shadow-md');
+                        btn.classList.remove('bg-white', 'text-[#a5b2ac]');
+                    }
+                });
+
+                if (level === 'N2') {
+                    currentGrammarData = grammarDataN2;
+                } else {
+                    currentGrammarData = grammarDataN5N4;
+                }
+                renderGrammarCards();
+            }
         
             function renderGrammarCards(filter = '') {
                 grammarGrid.innerHTML = '';
-                const filteredData = grammarData.filter(item => 
+                const filteredData = currentGrammarData.filter(item => 
                     item.grammar.includes(filter) || 
                     item.meaning.includes(filter) || 
-                    item.nuance.includes(filter) ||
+                    (item.nuance && item.nuance.includes(filter)) ||
                     item.examples.some(ex => ex.includes(filter))
                 );
         
@@ -339,11 +449,11 @@
                     const card = document.createElement('div');
                     card.className = 'bg-[#e8ebe6] rounded-xl shadow-lg p-6 flex flex-col justify-between border-2 border-[#dbe0d7] cursor-pointer transition-all duration-300 transform hover:-translate-y-2 card-hover';
                     card.innerHTML = `
-                        <div><h3 class="text-xl font-semibold text-[#4d5c56]">${item.id}. ${item.grammar}</h3>
-                            
+                        <div>
+                            <h3 class="text-xl font-semibold text-[#4d5c56]">${item.id}. ${item.grammar}</h3>
                             <p class="text-[#4d5c56] mt-2">${item.meaning}</p>
                         </div>
-                        <p class="text-sm text-[#4d5c56] mt-4 self-start">${item.nuance.split('/')[0]}</p>
+                        <p class="text-sm text-[#a5b2ac] mt-4 self-start">${item.nuance ? item.nuance.split('/')[0] : ''}</p>
                     `;
                     card.addEventListener('click', () => showModal(item));
                     grammarGrid.appendChild(card);
@@ -356,7 +466,7 @@
                     <div class="prose max-w-none text-[#4d5c56]">
                         <h2 class="text-2xl md:text-3xl font-light text-[#89b398]">${item.id}. ${item.grammar}</h2>
                         <p class="text-[#4d5c56] font-normal mt-1 mb-6">${item.meaning}</p>
-                        <p class="bg-[#f0f5f0] p-4 rounded-lg text-sm"><strong>ニュアンス：</strong> ${item.nuance.split('/')[0]} <br> <strong>中文解释：：</strong> ${item.nuance.split('/')[1]}</p>
+                        ${item.nuance ? `<p class="bg-[#f0f5f0] p-4 rounded-lg text-sm"><strong>ニュアンス：</strong> ${item.nuance.split('/')[0]} <br> <strong>中文解释：：</strong> ${item.nuance.split('/')[1]}</p>` : ''}
                         <h4 class="font-normal mt-8 mb-4 text-[#89b398] text-xl">例文：</h4>
                         <ul class="list-disc list-inside space-y-4 text-[#4d5c56]">
                             ${item.examples.map(ex => {
@@ -381,7 +491,8 @@
             }
         
             function startQuiz() {
-                const shuffled = [...grammarData].filter(item => item.parts && item.parts.length > 0 && item.examples && item.examples.length > 0).sort(() => 0.5 - Math.random());
+                const quizData = currentGrammarData.filter(item => item.parts && item.parts.length > 0 && item.examples && item.examples.length > 0);
+                const shuffled = [...quizData].sort(() => 0.5 - Math.random());
                 currentQuizState = {
                     questions: shuffled.slice(0, 10),
                     currentQuestionIndex: 0,
@@ -622,6 +733,11 @@
                 if (e.target === certificateModal) {
                     certificateModal.classList.add('hidden');
                 }
+            });
+            levelBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectLevel(btn.dataset.level);
+                });
             });
         
             renderGrammarCards();
