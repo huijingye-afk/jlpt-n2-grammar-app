@@ -4736,6 +4736,42 @@
 
     // ... (rest of the grammar points will be added here in full)
 ];
+let grammarStatuses = {}; // 用来存放所有语法的状态
+
+            // 功能：页面加载时，从localStorage读取已保存的状态
+            function loadStatuses() {
+                const savedStatuses = localStorage.getItem('myGrammarStatuses');
+                if (savedStatuses) {
+                    grammarStatuses = JSON.parse(savedStatuses); // 将字符串转回对象
+                }
+            }
+
+
+
+function saveStatus(grammarId, status, level) {
+    const key = `${level}-${grammarId}`;
+
+    if (status === '清除') {
+        delete grammarStatuses[key];
+    } else {
+        grammarStatuses[key] = status;
+    }
+
+    localStorage.setItem('myGrammarStatuses', JSON.stringify(grammarStatuses));
+
+    // --- 【核心修正】从这里开始 ---
+    // 1. 先获取到搜索框的 DOM 元素。
+    const searchInput = document.getElementById('search-input');
+    
+    // 2. 调用渲染函数时，把搜索框的当前值 (searchInput.value) 传递过去。
+    //    这样即使在搜索状态下标记，刷新后依然是搜索结果列表。
+    renderGrammarCards(searchInput.value); 
+    // --- 【核心修正】到这里结束 ---
+
+    // 3. 最后再关闭弹窗
+    const modalContainer = document.getElementById('modal-container');
+    closeModal(modalContainer);
+}
 
         // --- 5. Final Combined Grammar Data ---
         const allGrammarData = [
@@ -4748,7 +4784,9 @@
         let selectedLevel = 'N5/N4';
         
         document.addEventListener('DOMContentLoaded', () => {
+  loadStatuses(); // <--- 在这里添加！
             const navLibrary = document.getElementById('nav-library');
+           
             const navQuiz = document.getElementById('nav-quiz');
             const librarySection = document.getElementById('library-section');
             const quizSection = document.getElementById('quiz-section');
@@ -4813,73 +4851,130 @@
                 certLevelTitle.textContent = selectedLevel;
             }
         
-            function renderGrammarCards(filter = '') {
-                grammarGrid.innerHTML = '';
-                const currentData = allGrammarData.filter(item => item.level === selectedLevel);
-                
-                const filteredData = currentData.filter(item => 
-                    item.grammar.toLowerCase().includes(filter.toLowerCase()) || 
-                    item.meaning.includes(filter) || 
-                    (item.nuance && item.nuance.includes(filter))
-                ).sort((a, b) => a.id - b.id);
+       // --- (推荐) 同时将此函数也完整替换，以避免未来出现类似问题 ---
+function renderGrammarCards(filter = '') {
+    grammarGrid.innerHTML = '';
 
-                if (filteredData.length === 0) {
-                    grammarGrid.innerHTML = `<p class="text-[#a5b2ac] col-span-full text-center mt-8">没有找到匹配的文法，或者【${selectedLevel}】数据尚未添加。</p>`;
-                    return;
-                }
-        
-                filteredData.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-[#e8ebe6] rounded-xl shadow-lg p-6 flex flex-col justify-between border-2 border-[#dbe0d7] cursor-pointer transition-all duration-300 transform hover:-translate-y-2 card-hover';
-                    card.innerHTML = `
-                        <div>
-                            <h3 class="text-xl font-semibold text-[#4d5c56]">${item.id}. ${item.grammar}</h3>
-                            <p class="text-[#4d5c56] mt-2">${item.meaning}</p>
-                        </div>
-                        <p class="text-sm text-[#a5b2ac] mt-4 self-start">${item.nuance ? item.nuance.split('/')[0] : '基本文型'}</p>
-                    `;
-                    card.addEventListener('click', () => showModal(item));
-                    grammarGrid.appendChild(card);
-                });
-            }
-        
-           function showModal(item) {
-                const modal = modalContainer;
-                
-                // 遍历所有例句，并为每个例句生成一个<li>标签
-                const examplesHtml = item.examples.map(example => {
-                    const [jaExample, zhExample] = example.split('/');
-                    return `
-                        <li>
-                            <span class="text-[#4d5c56]">${jaExample}</span><br>
-                            <span class="text-[#a5b2ac] text-sm mt-1 block">${zhExample || ''}</span>
-                        </li>
-                    `;
-                }).join(''); // 将所有<li>标签拼接成一个字符串
+    const currentData = allGrammarData.filter(item => item.level === selectedLevel);
 
-                modalInnerContent.innerHTML = `
-                    <div class="prose max-w-none text-[#4d5c56]">
-                        <h2 class="text-2xl md:text-3xl font-light text-[#89b398]">【${item.level}】${item.grammar}</h2>
-                        <p class="text-[#4d5c56] font-normal mt-1 mb-6">${item.meaning}</p>
-                        ${item.nuance ? `<p class="bg-[#f0f5f0] p-4 rounded-lg text-sm"><strong>ニュアンス：</strong> ${item.nuance.split('/')[0]} <br> <strong>中文解释：</strong> ${item.nuance.split('/')[1] || item.nuance.split('/')[0]}</p>` : ''}
-                        <h4 class="font-normal mt-8 mb-4 text-[#89b398] text-xl">例文：</h4>
-                        <ul class="list-disc list-inside space-y-4 text-[#4d5c56]">
-                            ${examplesHtml}
-                        </ul>
-                    </div>
-                `;
-                modal.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                   modal.classList.add('open', 'opacity-100');
-                   modal.querySelector('.modal-content').classList.add('open');
-                });
-            }
+    const filteredData = currentData.filter(item => 
+        item.grammar.toLowerCase().includes(filter.toLowerCase()) || 
+        item.meaning.includes(filter) || 
+        (item.nuance && item.nuance.includes(filter))
+    ).sort((a, b) => a.id - b.id);
+
+    if (filteredData.length === 0) {
+        grammarGrid.innerHTML = `<p class="text-[#a5b2ac] col-span-full text-center mt-8">没有找到匹配的文法，或者【${selectedLevel}】数据尚未添加。</p>`;
+        return;
+    }
+
+    filteredData.forEach(item => {
+        const card = document.createElement('div');
+        const key = `${item.level}-${item.id}`;
+        const currentStatus = grammarStatuses[key];
+
+        let bgColor = 'bg-[#e8ebe6]';
+        let textColor = 'text-[#4d5c56]';
+        let nuanceColor = 'text-[#a5b2ac]';
+
+        if (currentStatus === '会了') {
+            bgColor = 'bg-slate-200';
+            textColor = 'text-slate-500';
+            nuanceColor = 'text-slate-400';
+        } else if (currentStatus === '模糊') {
+            bgColor = 'bg-yellow-100';
+            textColor = 'text-yellow-800';
+            nuanceColor = 'text-yellow-600';
+        } else if (currentStatus === '不会') {
+            bgColor = 'bg-red-100';
+            textColor = 'text-red-800';
+            nuanceColor = 'text-red-600';
+        }
+
+        card.className = `${bgColor} rounded-xl shadow-lg p-6 flex flex-col justify-between border-2 border-transparent cursor-pointer transition-all duration-300 transform hover:-translate-y-2 card-hover`;
+
+        card.innerHTML = `
+            <div>
+                <h3 class="text-xl font-semibold ${textColor}">${item.id}. ${item.grammar}</h3>
+                <p class="${textColor} mt-2">${item.meaning}</p>
+            </div>
+            <p class="text-sm ${nuanceColor} mt-4 self-start">${item.nuance ? item.nuance.split('/')[0] : '基本文型'}</p>
+        `;
+
+        card.addEventListener('click', () => showModal(item));
+        grammarGrid.appendChild(card);
+    });
+}
+
+            // renderGrammarCards を saveStatus からも使えるようにグローバルへ公開
+            window.renderGrammarCards = renderGrammarCards;
+
+function showModal(item) {
+    const modal = modalContainer;
+    const key = `${item.level}-${item.id}`;
+    const currentStatus = grammarStatuses[key] || '';
+
+    // 【核心修正】兼容两种不同的 examples 数据结构 (字符串数组 vs 包含单个字符串的数组)
+    // .flat() 方法会将 [['.../..'], ['.../..']] 这样的嵌套数组转换成 ['.../..', '.../..']，从而统一数据格式
+    const examplesHtml = item.examples.flat().map(example => {
+        const [jaExample, zhExample] = example.split('/');
+        return `
+            <li>
+                <span class="text-[#4d5c56]">${jaExample}</span><br>
+                <span class="text-[#a5b2ac] text-sm mt-1 block">${zhExample || ''}</span>
+            </li>
+        `;
+    }).join('');
+
+    modalInnerContent.innerHTML = `
+        <div class="prose max-w-none text-[#4d5c56]">
+            <h2 class="text-2xl md:text-3xl font-light text-[#89b398]">【${item.level}】${item.grammar}</h2>
+            <p class="text-[#4d5c56] font-normal mt-1 mb-6">${item.meaning}</p>
+            ${item.nuance ? `<p class="bg-[#f0f5f0] p-4 rounded-lg text-sm"><strong>ニュアンス：</strong> ${item.nuance.split('/')[0]} <br> <strong>中文解释：</strong> ${item.nuance.split('/')[1] || item.nuance.split('/')[0]}</p>` : ''}
+            <h4 class="font-normal mt-8 mb-4 text-[#89b398] text-xl">例文：</h4>
+            <ul class="list-disc list-inside space-y-4 text-[#4d5c56]">
+                ${examplesHtml}
+            </ul>
+        </div>
+        
+        <div class="mt-8 text-center border-t-2 border-[#f0f5f0] pt-6">
+            <h4 class="font-normal mb-4 text-[#6a7c73]">标记我的掌握程度：</h4>
+            <div id="status-buttons" class="flex justify-center flex-wrap gap-3">
+                <button data-id="${item.id}" data-status="会了" class="status-btn px-5 py-2 rounded-full font-light text-sm transition-all duration-200 ${currentStatus === '会了' ? 'bg-slate-400 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-slate-300'}">会了</button>
+                <button data-id="${item.id}" data-status="模糊" class="status-btn px-5 py-2 rounded-full font-light text-sm transition-all duration-200 ${currentStatus === '模糊' ? 'bg-yellow-400 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-yellow-300'}">模糊</button>
+                <button data-id="${item.id}" data-status="不会" class="status-btn px-5 py-2 rounded-full font-light text-sm transition-all duration-200 ${currentStatus === '不会' ? 'bg-red-400 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-red-300'}">不会</button>
+                <button data-id="${item.id}" data-status="清除" class="status-btn px-5 py-2 rounded-full font-light text-sm transition-all duration-200 bg-gray-400 text-white hover:bg-gray-500">清除标记</button>
+            </div>
+        </div>
+    `;
+
+    // 为弹窗内的按钮绑定点击事件
+    modalInnerContent.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            const status = btn.dataset.status;
             
+            // 调用核心函数，执行保存、刷新、并关闭弹窗一系列操作
+            saveStatus(id, status, item.level); 
+            
+        }, { once: true }); // 使用 once: true 选项，防止任何意外的重复绑定
+    });
+
+    // 显示弹窗
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+       modal.classList.add('open', 'opacity-100');
+       modal.querySelector('.modal-content').classList.add('open');
+    });
+}
+         
             function closeModal(modal) {
                 modal.classList.remove('open', 'opacity-100');
                 modal.querySelector('.modal-content').classList.remove('open');
                 modal.addEventListener('transitionend', () => modal.classList.add('hidden'), { once: true });
             }
+
+            window.closeModal = closeModal;
         
             function startQuiz() {
                 const availableData = allGrammarData.filter(item => item.level === selectedLevel && item.parts && item.parts.length > 0 && Array.isArray(item.examples) && item.examples.length > 0);
@@ -5113,7 +5208,3 @@
     </script>
 </body>
 </html>
-
-
-
-
